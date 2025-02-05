@@ -24,7 +24,7 @@ export class TeacherListPage {
 
         await this.searchInput.fill(email);
         await this.page.waitForLoadState("networkidle");
-        await this.teacherRow.waitFor({ state: "visible", timeout: 2000 });
+        // await this.teacherRow.waitFor({ state: "visible", timeout: 2000 });
         // await this.page.pause();
         await expect(this.teacherRow).toBeVisible();
         

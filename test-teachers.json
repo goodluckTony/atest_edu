@@ -334,5 +334,17 @@
     "phone": "+380508780968",
     "telegram": "@Creola",
     "link": "alienated-impostor.org"
+  },
+  {
+    "lastName": "Miller",
+    "firstName": "Dusty",
+    "surname": "Shawn",
+    "date": "31.12.1909",
+    "subject": "Математика",
+    "gender": 2,
+    "email": "Benjamin37@example.com",
+    "phone": "+380682692410",
+    "telegram": "@Gina",
+    "link": "vibrant-tray.net"
   }
 ]

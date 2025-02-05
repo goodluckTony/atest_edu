@@ -77,6 +77,10 @@ test.describe('User creation', () => {
     await expect(teacherProfilePage.getTeacherPhone()).toHaveText(user.phone);
     await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(user.telegram);
     await expect(teacherProfilePage.getTeacherLink()).toHaveText(user.link);
+    const teacherImage = await teacherProfilePage.getTeacherImage();
+    const imageSrc = await teacherImage.getAttribute("src");
+    const expectedFileName = user.gender === Gender.Male ? "male-img.jpg" : "female-img.jpg";
+    await expect(imageSrc).toContain(expectedFileName);
 
 
     // Add teacher into test-teachers.json 

@@ -11,6 +11,7 @@ export class TeacherProfilePage {
     private teacherPhone: Locator;
     private teacherTelegram: Locator;
     private teacherLink: Locator;
+    private teacherProfileImage: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -23,6 +24,7 @@ export class TeacherProfilePage {
         this.teacherPhone = page.locator("//form[2]//p[contains(text(), 'Телефон')]/following::p[1]");
         this.teacherTelegram = page.locator("//form[2]//p[contains(text(), 'Telegram')]/following::p[1]");
         this.teacherLink = page.locator("//form[2]//p[contains(text(), 'Лінк')]/following::p[1]");
+        this.teacherProfileImage = page.locator("img.MuiAvatar-img");
     }
 
     getTeacherLastName(): Locator {
@@ -59,6 +61,10 @@ export class TeacherProfilePage {
 
     getTeacherLink(): Locator {
         return this.teacherLink;
+    }
+
+    getTeacherImage(): Locator {
+        return this.teacherProfileImage;
     }
 
     // async verifyTeacherDetails(): Promise<void> {

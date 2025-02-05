@@ -1,7 +1,9 @@
 import { Locator, Page } from "@playwright/test";
+import path from "path";
 
 export class TeacherFormPage {
     private page: Page;
+    private fileUploadInput: Locator;
     private lastNameInput: Locator;
     private firstNameInput: Locator;
     private surnameInput: Locator;
@@ -16,6 +18,7 @@ export class TeacherFormPage {
 
     constructor (page: Page) {
         this.page = page;
+        this.fileUploadInput = page.locator("input[type='file']");
         this.lastNameInput = page.locator("[name='lastName']");
         this.firstNameInput = page.locator("[name='firstName']");
         // this.surenameInput = page.locator("[name='surename']");
@@ -33,6 +36,7 @@ export class TeacherFormPage {
     async fillTeacherForm(user: CreateTeacherData): Promise<void> {
         // await this.page.waitForLoadState('networkidle');
         await this.lastNameInput.fill(user.lastName);
+        // await this.page.pause();
         await this.firstNameInput.fill(user.firstName);
         // await this.page.pause();
         // await this.surenameInput.waitFor({ state: 'visible', timeout: 5000 });
@@ -47,7 +51,16 @@ export class TeacherFormPage {
         await this.phoneInput.fill(user.phone);
         await this.telegramInput.fill(user.telegram);
         await this.linkInput.fill(user.link);
+        await this.uploadTeacherImage(user.gender);
         await this.page.waitForLoadState("networkidle");
+    }
+
+    async uploadTeacherImage(gender: Gender): Promise<void> {
+        const imagePath = gender === Gender.Male
+            ? path.resolve("assets/male-img.jpg")
+            : path.resolve("assets/female-img.jpg");
+
+        await this.fileUploadInput.setInputFiles(imagePath);
     }
 
     async submitForm(): Promise<void> {

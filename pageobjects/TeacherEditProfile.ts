@@ -68,7 +68,11 @@ export class EditTeacherProfile {
   }
 
   async editTeacherEmail(user: EditTeacherData): Promise<void> {
-    await this.lastNameInput.fill(user.lastName+user.email);
+    const currentEmail = await this.emailInput.inputValue();
+    const domain = currentEmail.substring(currentEmail.indexOf("@"));
+    const newEmail = `${user.firstName}${user.lastName}${domain}`;
+    await this.emailInput.fill(newEmail);
+    await this.page.pause();
   }
 
   async editTeacherPhone(): Promise<void> {

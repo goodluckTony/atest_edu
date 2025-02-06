@@ -45,7 +45,7 @@ test.describe('User creation', () => {
       email: faker.internet.email().replace(/@.+$/, '@example.com'),
       phone: phone,
       telegram: `@${faker.person.firstName()}`,
-      link: faker.internet.domainName()
+      link: "https://"+faker.internet.domainName()
     };
     
     // Login

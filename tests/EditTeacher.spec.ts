@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { de, faker } from '@faker-js/faker';
+// import { de, faker } from '@faker-js/faker';
 import fs from 'fs/promises';
 import { LoginPage } from '../pageobjects/LoginPage';
 import { AdminPanelUsersPage } from '../pageobjects/AdminPanelUsersPage';
@@ -7,6 +7,8 @@ import { TeacherListPage } from '../pageobjects/TeacherListPage';
 import { Gender, TeacherFormPage, CreateTeacherData } from '../pageobjects/TeacherFormPage';
 import { TeacherProfilePage } from '../pageobjects/TeacherProfilePage';
 import { EditTeacherProfile } from '../pageobjects/TeacherEditProfile';
+import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
+import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 
 test.describe('User creation', () => {
   let loginPage: LoginPage;
@@ -14,13 +16,14 @@ test.describe('User creation', () => {
   let teacherListPage: TeacherListPage;
   let teacherFormPage: TeacherFormPage;
   let teacherProfilePage: TeacherProfilePage;
-  let user: CreateTeacherData;
+  // let user: CreateTeacherData;
   let editTeacherProfile: EditTeacherProfile;
+  let user;
 
-  const mainCred = {
-    email: 'admin-dev@fasted.space',
-    pass: 'M_3fUn$teEn'
-  };
+  // const mainCred = {
+  //   email: 'admin-dev@fasted.space',
+  //   pass: 'M_3fUn$teEn'
+  // };
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
@@ -32,26 +35,31 @@ test.describe('User creation', () => {
   });
 
   test('Should create test teacher', async () => {
+    
+    const mainCred = AdminCredentials.admin;
     // Generate random user data
-    const randomDate = faker.date.between({ from: '1900-01-01', to: '2025-12-31' });
-    const formattedDate = `${randomDate.getDate().toString().padStart(2, '0')}.${(randomDate.getMonth() + 1).toString().padStart(2, '0')}.${randomDate.getFullYear()}`;
-    const ukrPhoneOperators = ['63', '50', '93', '73', '67', '68', '96', '97', '98', '91', '95', '99'];
-    const randomNumber = faker.phone.number({ style: 'international' });
-    const phone = `+380${faker.helpers.arrayElement(ukrPhoneOperators)}${randomNumber.slice(-7)}`;
-    user = {
-      lastName: faker.person.lastName(),
-      firstName: faker.person.firstName(),
-      surname: faker.person.middleName(),
-      date: formattedDate,
-      subject: faker.helpers.arrayElement(['Математика', 'Англійська']),
-      gender: faker.helpers.arrayElement([Gender.Male, Gender.Female]),
-      email: faker.internet.email().replace(/@.+$/, '@example.com'),
-      phone: phone,
-      telegram: `@${faker.person.firstName()}`,
-      link: "https://"+faker.internet.domainName()
-    };
+    // const randomDate = faker.date.between({ from: '1900-01-01', to: '2025-12-31' });
+    // const formattedDate = `${randomDate.getDate().toString().padStart(2, '0')}.${(randomDate.getMonth() + 1).toString().padStart(2, '0')}.${randomDate.getFullYear()}`;
+    // const ukrPhoneOperators = ['63', '50', '93', '73', '67', '68', '96', '97', '98', '91', '95', '99'];
+    // const randomNumber = faker.phone.number({ style: 'international' });
+    // const phone = `+380${faker.helpers.arrayElement(ukrPhoneOperators)}${randomNumber.slice(-7)}`;
+    // user = {
+    //   lastName: faker.person.lastName(),
+    //   firstName: faker.person.firstName(),
+    //   surname: faker.person.middleName(),
+    //   date: formattedDate,
+    //   subject: faker.helpers.arrayElement(['Математика', 'Англійська']),
+    //   gender: faker.helpers.arrayElement([Gender.Male, Gender.Female]),
+    //   email: faker.internet.email().replace(/@.+$/, '@example.com'),
+    //   phone: phone,
+    //   telegram: `@${faker.person.firstName()}`,
+    //   link: "https://"+faker.internet.domainName()
+    // };
+    user = UserDataGenerator.generateTeacher();
 
-    // Login
+    
+
+    // Login as admin
     await loginPage.open()
     await loginPage.login(mainCred.email, mainCred.pass);
   

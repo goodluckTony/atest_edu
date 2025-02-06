@@ -17,21 +17,16 @@ export class TeacherListPage {
         await this.addNewTeacherBtn.click();
     }
 
-    async searchTeacherByEmail(email: string, subject: string): Promise<void> { // open teacher details
-        // teacher list page
+    async searchTeacherByEmail(email: string, subject: string): Promise<void> {
         const subjectButton = this.page.locator(`button:has-text('${subject}')`);
         await subjectButton.click();
-
         await this.searchInput.fill(email);
         await this.page.waitForLoadState("networkidle");
-        // await this.teacherRow.waitFor({ state: "visible", timeout: 2000 });
-        // await this.page.pause();
         await expect(this.teacherRow).toBeVisible();
-        
         const rowEmail = await this.teacherRow.innerText();
         expect(rowEmail.trim()).toBe(email.trim());
         await this.teacherRow.click();
         await this.page.waitForLoadState("networkidle");
-        // teacher list page
+
     }
 }

@@ -21,7 +21,6 @@ export class TeacherFormPage {
         this.fileUploadInput = page.locator("input[type='file']");
         this.lastNameInput = page.locator("[name='lastName']");
         this.firstNameInput = page.locator("[name='firstName']");
-        // this.surenameInput = page.locator("[name='surename']");
         this.surnameInput = page.locator("[name='surname']");
         this.birthdayInput = page.locator("[name='birthday']");
         this.subjectDropdown = page.locator("[role='combobox']");
@@ -34,18 +33,12 @@ export class TeacherFormPage {
     }
 
     async fillTeacherForm(user: CreateTeacherData): Promise<void> {
-        // await this.page.waitForLoadState('networkidle');
         await this.lastNameInput.fill(user.lastName);
-        // await this.page.pause();
         await this.firstNameInput.fill(user.firstName);
-        // await this.page.pause();
-        // await this.surenameInput.waitFor({ state: 'visible', timeout: 5000 });
         await this.surnameInput.fill(user.surname);
-        // await this.page.pause();
         await this.birthdayInput.fill(user.date);
         await this.subjectDropdown.click();
         await this.page.locator(`li:has-text('${user.subject}')`).click();
-        // await this.genderButton.click();
         await this.page.locator(`span input[value='${user.gender}']`).click();
         await this.emailInput.fill(user.email);
         await this.phoneInput.fill(user.phone);
@@ -67,7 +60,6 @@ export class TeacherFormPage {
         await this.page.waitForLoadState("networkidle");
         await this.submitButton.click();
         await this.page.waitForLoadState("networkidle");
-        // await this.page.waitForEvent("page");
     }
 }
 

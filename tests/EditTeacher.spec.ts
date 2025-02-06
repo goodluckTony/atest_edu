@@ -46,7 +46,6 @@ test.describe('User creation', () => {
       subject: faker.helpers.arrayElement(['Математика', 'Англійська']),
       gender: faker.helpers.arrayElement([Gender.Male, Gender.Female]),
       email: faker.internet.email().replace(/@.+$/, '@example.com'),
-      // phone: `${faker.phone.number({ style: 'international' })}`,
       phone: phone,
       telegram: `@${faker.person.firstName()}`,
       link: "https://"+faker.internet.domainName()
@@ -59,14 +58,14 @@ test.describe('User creation', () => {
   
     // Navigate to teacher form
     await adminPanelUsersPage.navigateToTeachersList();
-    await teacherListPage.addNewTeacherBtnClick(); // move to teacher list page
+    await teacherListPage.addNewTeacherBtnClick();
   
     // Fill teacher form
     await teacherFormPage.fillTeacherForm(user);
     await teacherFormPage.submitForm();
   
     // Search teacher and verify details
-    await teacherListPage.searchTeacherByEmail(user.email, user.subject); // move to teacher list page
+    await teacherListPage.searchTeacherByEmail(user.email, user.subject);
   
     await expect(teacherProfilePage.getTeacherLastName()).toHaveText(user.lastName);
     await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(user.firstName);
@@ -77,7 +76,6 @@ test.describe('User creation', () => {
     await expect(teacherProfilePage.getTeacherPhone()).toHaveText(user.phone);
     await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(user.telegram);
     await expect(teacherProfilePage.getTeacherLink()).toHaveText(user.link);
-    // await expect(teacherProfilePage.getTeacherLink()).toHaveText("asd");
     const teacherImage = await teacherProfilePage.getTeacherImage();
     const imageSrc = await teacherImage.getAttribute("src");
     const expectedFileName = user.gender === Gender.Male ? "male-img.jpg" : "female-img.jpg";
@@ -85,18 +83,12 @@ test.describe('User creation', () => {
 
 
     // Add teacher into test-teachers.json 
-    // expect(await teacherDetailsPage.firstNameText()).(user.firstName);
-    // const isMatched = await teacherDetailsPage.verifyTeacherDetails(user);
-    // if (isMatched) {
     const usersFilePath = 'test-teachers.json';
     const existingUsers = await fs.readFile(usersFilePath, 'utf-8').catch(() => '[]');
     const users = JSON.parse(existingUsers);
     users.push(user);
     await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
     console.log(`User data saved to ${usersFilePath}`);
-    // } else {
-    //   console.log('User data was NOT saved to JSON due to mismatched data');
-    // }
 
     // Edit teacher profile
     await editTeacherProfile.editTeacherProfileButton();

@@ -39,7 +39,7 @@ export class EditTeacherProfile {
   }
 
   async editTeacherLastname(): Promise<void> {
-    await this.lastNameInput.fill("LN");
+    await this.firstNameInput.fill("LN");
   }
 
   async editTeacherFirstname(): Promise<void> {
@@ -57,7 +57,7 @@ export class EditTeacherProfile {
   async editTeacherSubject(user: EditTeacherData): Promise<void> {
     await this.subjectDropdown.click();
   }
-
+  
   async editTeacherGender(): Promise<void> {
     const femaleLabel = this.page.locator("label:has-text('Жіноча')");
     const maleLabel = this.page.locator("label:has-text('Чоловіча')");
@@ -76,15 +76,15 @@ export class EditTeacherProfile {
   }
 
   async editTeacherPhone(): Promise<void> {
-    await this.lastNameInput.fill("Abdul");
+    await this.phoneInput.fill("Abdul");
   }
 
   async editTeacherTelegram(): Promise<void> {
-    await this.lastNameInput.fill("Abdul");
+    await this.telegramInput.fill("Abdul");
   }
 
   async editTeacherLink(): Promise<void> {
-    await this.lastNameInput.fill("Abdul");
+    await this.linkInput.fill("Abdul");
   }
 
   getSaveChangesButton(): Locator {

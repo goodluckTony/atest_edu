@@ -18,7 +18,7 @@ test.describe('User creation', () => {
   let teacherProfilePage: TeacherProfilePage;
   // let user: CreateTeacherData;
   let editTeacherProfile: EditTeacherProfile;
-  let user;
+  let teacher;
 
   // const mainCred = {
   //   email: 'admin-dev@fasted.space',
@@ -55,7 +55,7 @@ test.describe('User creation', () => {
     //   telegram: `@${faker.person.firstName()}`,
     //   link: "https://"+faker.internet.domainName()
     // };
-    user = UserDataGenerator.generateTeacher();
+    teacher = UserDataGenerator.generateTeacher();
 
     
 
@@ -69,38 +69,38 @@ test.describe('User creation', () => {
     await teacherListPage.addNewTeacherBtnClick();
   
     // Fill teacher form
-    await teacherFormPage.fillTeacherForm(user);
+    await teacherFormPage.fillTeacherForm(teacher);
     await teacherFormPage.submitForm();
   
     // Search teacher and verify details
-    await teacherListPage.searchTeacherByEmail(user.email, user.subject);
+    await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
   
-    await expect(teacherProfilePage.getTeacherLastName()).toHaveText(user.lastName);
-    await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(user.firstName);
-    await expect(teacherProfilePage.getTeacherSurname()).toHaveText(user.surname);
-    await expect(teacherProfilePage.getTeacherDate()).toHaveText(user.date);
-    await expect(teacherProfilePage.getTeacherGender()).toHaveText(user.gender === 1 ? "Чоловіча" : "Жіноча");
-    await expect(teacherProfilePage.getTeacherEmail()).toHaveText(user.email);
-    await expect(teacherProfilePage.getTeacherPhone()).toHaveText(user.phone);
-    await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(user.telegram);
-    await expect(teacherProfilePage.getTeacherLink()).toHaveText(user.link);
+    await expect(teacherProfilePage.getTeacherLastName()).toHaveText(teacher.lastName);
+    await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(teacher.firstName);
+    await expect(teacherProfilePage.getTeacherSurname()).toHaveText(teacher.surname);
+    await expect(teacherProfilePage.getTeacherDate()).toHaveText(teacher.date);
+    await expect(teacherProfilePage.getTeacherGender()).toHaveText(teacher.gender === 1 ? "Чоловіча" : "Жіноча");
+    await expect(teacherProfilePage.getTeacherEmail()).toHaveText(teacher.email);
+    await expect(teacherProfilePage.getTeacherPhone()).toHaveText(teacher.phone);
+    await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(teacher.telegram);
+    await expect(teacherProfilePage.getTeacherLink()).toHaveText(teacher.link);
     const teacherImage = await teacherProfilePage.getTeacherImage();
     const imageSrc = await teacherImage.getAttribute("src");
-    const expectedFileName = user.gender === Gender.Male ? "male-img.jpg" : "female-img.jpg";
+    const expectedFileName = teacher.gender === Gender.Male ? "male-img.jpg" : "female-img.jpg";
     await expect(imageSrc).toContain(expectedFileName);
 
 
     // Add teacher into test-teachers.json 
-    const usersFilePath = 'test-teachers.json';
-    const existingUsers = await fs.readFile(usersFilePath, 'utf-8').catch(() => '[]');
-    const users = JSON.parse(existingUsers);
-    users.push(user);
-    await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
-    console.log(`User data saved to ${usersFilePath}`);
+    const teachersFilePath = 'test-teachers.json';
+    const existingTeachers = await fs.readFile(teachersFilePath, 'utf-8').catch(() => '[]');
+    const teachers = JSON.parse(existingTeachers);
+    teachers.push(teacher);
+    await fs.writeFile(teachersFilePath, JSON.stringify(teachers, null, 2));
+    console.log(`User data saved to ${teachersFilePath}`);
 
     // Edit teacher profile
     await editTeacherProfile.editTeacherProfileButton();
-    await editTeacherProfile.editTeacherEmail(user);
+    await editTeacherProfile.editTeacherEmail(teacher);
     await expect(editTeacherProfile.getSaveChangesButton()).toBeEnabled();
   });
 });

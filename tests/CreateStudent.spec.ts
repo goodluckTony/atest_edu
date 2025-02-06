@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import fs from 'fs/promises';
 import { LoginPage } from '../pageobjects/LoginPage';
 import { AdminPanelUsersPage } from '../pageobjects/AdminPanelUsersPage';
 import { StudentListPage } from '../pageobjects/StudentListPage';
@@ -41,5 +42,13 @@ test.describe("Student creation", () => {
 
         // Search for the student in the list and check if the data is correct
         await studentListPage.searchStudentByEmail(student.email, student.telegram);
+
+        // Add teacher into test-teachers.json
+        const studentsFilePath = 'test-students.json';
+        const existingStudents = await fs.readFile(studentsFilePath, 'utf-8').catch(() => '[]');
+        const students = JSON.parse(existingStudents);
+        students.push(student);
+        await fs.writeFile(studentsFilePath, JSON.stringify(students, null, 2));
+        console.log(`User data saved to ${studentsFilePath}`);
     });
 });

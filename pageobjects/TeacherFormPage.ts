@@ -32,19 +32,19 @@ export class TeacherFormPage {
         this.submitButton = page.locator("button[type='submit']");
     }
 
-    async fillTeacherForm(user: CreateTeacherData): Promise<void> {
-        await this.lastNameInput.fill(user.lastName);
-        await this.firstNameInput.fill(user.firstName);
-        await this.surnameInput.fill(user.surname);
-        await this.birthdayInput.fill(user.date);
+    async fillTeacherForm(teacher: CreateTeacherData): Promise<void> {
+        await this.lastNameInput.fill(teacher.lastName);
+        await this.firstNameInput.fill(teacher.firstName);
+        await this.surnameInput.fill(teacher.surname);
+        await this.birthdayInput.fill(teacher.date);
         await this.subjectDropdown.click();
-        await this.page.locator(`li:has-text('${user.subject}')`).click();
-        await this.page.locator(`span input[value='${user.gender}']`).click();
-        await this.emailInput.fill(user.email);
-        await this.phoneInput.fill(user.phone);
-        await this.telegramInput.fill(user.telegram);
-        await this.linkInput.fill(user.link);
-        await this.uploadTeacherImage(user.gender);
+        await this.page.locator(`li:has-text('${teacher.subject}')`).click();
+        await this.page.locator(`span input[value='${teacher.gender}']`).click();
+        await this.emailInput.fill(teacher.email);
+        await this.phoneInput.fill(teacher.phone);
+        await this.telegramInput.fill(teacher.telegram);
+        await this.linkInput.fill(teacher.link);
+        await this.uploadTeacherImage(teacher.gender);
         await this.page.waitForLoadState("networkidle");
     }
 

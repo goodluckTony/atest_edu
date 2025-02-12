@@ -1,11 +1,13 @@
-import { test, expect } from '@playwright/test';
-import { de, faker } from '@faker-js/faker';
+import { test, expect, request } from '@playwright/test';
 import fs from 'fs/promises';
 import { LoginPage } from '../pageobjects/LoginPage';
 import { AdminPanelUsersPage } from '../pageobjects/AdminPanelUsersPage';
 import { TeacherListPage } from '../pageobjects/TeacherListPage';
 import { Gender, TeacherFormPage, CreateTeacherData } from '../pageobjects/TeacherFormPage';
 import { TeacherProfilePage } from '../pageobjects/TeacherProfilePage';
+import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
+import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
+import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 
 test.describe('User creation', () => {
   let loginPage: LoginPage;
@@ -13,73 +15,72 @@ test.describe('User creation', () => {
   let teacherListPage: TeacherListPage;
   let teacherFormPage: TeacherFormPage;
   let teacherProfilePage: TeacherProfilePage;
-  let user: CreateTeacherData;
+  let teacher;
+  let apiHelper: ApiHelper;
+  let token: string;
+  let userId: number;
 
-  const mainCred = {
-    email: 'admin-dev@fasted.space',
-    pass: 'M_3fUn$teEn'
-  };
-
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
     loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
+    apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
   });
 
-  test('Should create test teacher', async () => {
+  test('Should create test teacher', async ({ page, request }) => {
     // Generate random user data
-    const randomDate = faker.date.between({ from: '1900-01-01', to: '2025-12-31' });
-    const formattedDate = `${randomDate.getDate().toString().padStart(2, '0')}.${(randomDate.getMonth() + 1).toString().padStart(2, '0')}.${randomDate.getFullYear()}`;
-    const ukrPhoneOperators = ['63', '50', '93', '73', '67', '68', '96', '97', '98', '91', '95', '99'];
-    const randomNumber = faker.phone.number({ style: 'international' });
-    const phone = `+380${faker.helpers.arrayElement(ukrPhoneOperators)}${randomNumber.slice(-7)}`;
-    user = {
-      lastName: faker.person.lastName(),
-      firstName: faker.person.firstName(),
-      surname: faker.person.middleName(),
-      date: formattedDate,
-      subject: faker.helpers.arrayElement(['Математика', 'Англійська']),
-      gender: faker.helpers.arrayElement([Gender.Male, Gender.Female]),
-      email: faker.internet.email().replace(/@.+$/, '@example.com'),
-      phone: phone,
-      telegram: `@${faker.person.firstName()}`,
-      link: "https://"+faker.internet.domainName()
-    };
-    
+    const mainCred = AdminCredentials.admin;
+    teacher = UserDataGenerator.generateTeacher();
+
     // Login
     await loginPage.open()
     await loginPage.login(mainCred.email, mainCred.pass);
-  
-  
+
     // Navigate to teacher form
     await adminPanelUsersPage.navigateToTeachersList();
     await teacherListPage.addNewTeacherBtnClick();
-  
+
     // Fill teacher form
-    await teacherFormPage.fillTeacherForm(user);
+    await teacherFormPage.fillTeacherForm(teacher);
     await teacherFormPage.submitForm();
-  
+
     // Search teacher and verify details
-    await teacherListPage.searchTeacherByEmail(user.email, user.subject);
-  
-    await expect(teacherProfilePage.getTeacherLastName()).toHaveText(user.lastName);
-    await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(user.firstName);
-    await expect(teacherProfilePage.getTeacherSurname()).toHaveText(user.surname);
-    await expect(teacherProfilePage.getTeacherDate()).toHaveText(user.date);
-    await expect(teacherProfilePage.getTeacherGender()).toHaveText(user.gender === 1 ? "Чоловіча" : "Жіноча");
-    await expect(teacherProfilePage.getTeacherEmail()).toHaveText(user.email);
-    await expect(teacherProfilePage.getTeacherPhone()).toHaveText(user.phone);
-    await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(user.telegram);
-    await expect(teacherProfilePage.getTeacherLink()).toHaveText("asd");
-    
+    await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
+
+    await expect(teacherProfilePage.getTeacherLastName()).toHaveText(teacher.lastName);
+    await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(teacher.firstName);
+    await expect(teacherProfilePage.getTeacherSurname()).toHaveText(teacher.surname);
+    await expect(teacherProfilePage.getTeacherDate()).toHaveText(teacher.date);
+    await expect(teacherProfilePage.getTeacherGender()).toHaveText(teacher.gender === 1 ? "Чоловіча" : "Жіноча");
+    await expect(teacherProfilePage.getTeacherEmail()).toHaveText(teacher.email);
+    await expect(teacherProfilePage.getTeacherPhone()).toHaveText(teacher.phone);
+    await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(teacher.telegram);
+    await expect(teacherProfilePage.getTeacherLink()).toHaveText(teacher.link);
+    // await expect(teacherProfilePage.getTeacherLink()).toHaveText("asd");
+
     // Add teacher into test-teachers.json
     const usersFilePath = 'test-teachers.json';
     const existingUsers = await fs.readFile(usersFilePath, 'utf-8').catch(() => '[]');
     const users = JSON.parse(existingUsers);
-    users.push(user);
+    users.push(teacher);
     await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
     console.log(`User data saved to ${usersFilePath}`);
+  });
+
+  test.afterEach(async () => {
+    token = loginPage.accessToken;
+    userId = teacherFormPage.teacherId;
+
+    // DELETE created teacher via API
+    console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
+    if(userId && token) {
+      const isDeleted = await apiHelper.deleteUser(userId, token);
+      await expect(isDeleted).toBe(true);
+      console.log(`Teacher with ID ${userId} deleted successfully.`)
+    } else {
+      console.warn('User ID or Token is missing. Skipping deletion.');
+    }
   });
 });

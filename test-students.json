@@ -16,5 +16,32 @@
     "email": "Mariana12@example.com",
     "phone": "+380984412565",
     "telegram": "@Luigi"
+  },
+  {
+    "lastName": "Hoppe",
+    "firstName": "Mattie",
+    "surname": "Taylor",
+    "date": "02.01.2017",
+    "email": "Virginia93@example.com",
+    "phone": "+380954849840",
+    "telegram": "@Bette"
+  },
+  {
+    "lastName": "Hermiston",
+    "firstName": "Cierra",
+    "surname": "Charlie",
+    "date": "15.04.1909",
+    "email": "Khalid.Runte@example.com",
+    "phone": "+380913266765",
+    "telegram": "@Eveline"
+  },
+  {
+    "lastName": "Kihn",
+    "firstName": "Raquel",
+    "surname": "Jules",
+    "date": "04.11.1904",
+    "email": "Mustafa.Effertz34@example.com",
+    "phone": "+380634568191",
+    "telegram": "@Eino"
   }
 ]

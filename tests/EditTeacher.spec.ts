@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-// import { de, faker } from '@faker-js/faker';
 import fs from 'fs/promises';
 import { LoginPage } from '../pageobjects/LoginPage';
 import { AdminPanelUsersPage } from '../pageobjects/AdminPanelUsersPage';
@@ -9,6 +8,7 @@ import { TeacherProfilePage } from '../pageobjects/TeacherProfilePage';
 import { EditTeacherProfile } from '../pageobjects/TeacherEditProfile';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
+import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 
 test.describe('User creation', () => {
   let loginPage: LoginPage;
@@ -16,53 +16,32 @@ test.describe('User creation', () => {
   let teacherListPage: TeacherListPage;
   let teacherFormPage: TeacherFormPage;
   let teacherProfilePage: TeacherProfilePage;
-  // let user: CreateTeacherData;
   let editTeacherProfile: EditTeacherProfile;
   let teacher;
+  let newTeacher;
+  let apiHelper: ApiHelper;
+  let token: string;
+  let userId: number;
 
-  // const mainCred = {
-  //   email: 'admin-dev@fasted.space',
-  //   pass: 'M_3fUn$teEn'
-  // };
-
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
     loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     editTeacherProfile = new EditTeacherProfile(page);
+    apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
   });
 
-  test('Should create test teacher', async () => {
+  test('Should create test teacher', async ({ page, request }) => {
     
     const mainCred = AdminCredentials.admin;
-    // Generate random user data
-    // const randomDate = faker.date.between({ from: '1900-01-01', to: '2025-12-31' });
-    // const formattedDate = `${randomDate.getDate().toString().padStart(2, '0')}.${(randomDate.getMonth() + 1).toString().padStart(2, '0')}.${randomDate.getFullYear()}`;
-    // const ukrPhoneOperators = ['63', '50', '93', '73', '67', '68', '96', '97', '98', '91', '95', '99'];
-    // const randomNumber = faker.phone.number({ style: 'international' });
-    // const phone = `+380${faker.helpers.arrayElement(ukrPhoneOperators)}${randomNumber.slice(-7)}`;
-    // user = {
-    //   lastName: faker.person.lastName(),
-    //   firstName: faker.person.firstName(),
-    //   surname: faker.person.middleName(),
-    //   date: formattedDate,
-    //   subject: faker.helpers.arrayElement(['Математика', 'Англійська']),
-    //   gender: faker.helpers.arrayElement([Gender.Male, Gender.Female]),
-    //   email: faker.internet.email().replace(/@.+$/, '@example.com'),
-    //   phone: phone,
-    //   telegram: `@${faker.person.firstName()}`,
-    //   link: "https://"+faker.internet.domainName()
-    // };
     teacher = UserDataGenerator.generateTeacher();
-
-    
+    newTeacher = UserDataGenerator.generateTeacher();
 
     // Login as admin
     await loginPage.open()
     await loginPage.login(mainCred.email, mainCred.pass);
-  
   
     // Navigate to teacher form
     await adminPanelUsersPage.navigateToTeachersList();
@@ -99,8 +78,32 @@ test.describe('User creation', () => {
     console.log(`User data saved to ${teachersFilePath}`);
 
     // Edit teacher profile
-    await editTeacherProfile.editTeacherProfileButton();
-    await editTeacherProfile.editTeacherEmail(teacher);
-    await expect(editTeacherProfile.getSaveChangesButton()).toBeEnabled();
+    // await editTeacherProfile.editTeacherProfileButton();
+    // await editTeacherProfile.editTeacherLastname(newTeacher.lastName);
+    // await editTeacherProfile.editTeacherFirstname(newTeacher.firstName);
+    // await editTeacherProfile.editTeacherSurname(newTeacher.surname);
+    // await editTeacherProfile.editTeacherBirthday(newTeacher.date);
+    // await editTeacherProfile.editTeacherGender(newTeacher.gender);
+    // await editTeacherProfile.editTeacherEmail(newTeacher.email);
+    // await editTeacherProfile.editTeacherPhone(newTeacher.phone);
+    // await editTeacherProfile.editTeacherTelegram(newTeacher.telegram);
+    // await editTeacherProfile.editTeacherLink(newTeacher.link);
+    // await expect(editTeacherProfile.getSaveChangesButton()).toBeEnabled();
+
+  });
+  
+  test.afterEach(async () => {
+    token = loginPage.accessToken;
+    userId = teacherFormPage.teacherId;
+
+    // DELETE created teacher via API
+    console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
+    if(userId && token) {
+      const isDeleted = await apiHelper.deleteUser(userId, token);
+      await expect(isDeleted).toBe(true);
+      console.log(`Teacher with ID ${userId} deleted successfully.`)
+    } else {
+      console.warn('User ID or Token is missing. Skipping deletion.');
+    }
   });
 });

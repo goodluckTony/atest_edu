@@ -10,7 +10,8 @@ export class TeacherListPage {
         this.page = page;
         this.addNewTeacherBtn = page.locator("[href*='teachers/add-new']");
         this.searchInput = page.locator("[placeholder*='Пошук']");
-        this.teacherRow = page.locator("td:nth-child(3)");
+        // this.teacherRow = page.locator("td:nth-child(3)");
+        this.teacherRow = page.locator("tbody a");
     }
 
     async addNewTeacherBtnClick(): Promise<void> {
@@ -22,11 +23,9 @@ export class TeacherListPage {
         await subjectButton.click();
         await this.searchInput.fill(email);
         await this.page.waitForLoadState("networkidle");
-        await expect(this.teacherRow).toBeVisible();
-        const rowEmail = await this.teacherRow.innerText();
-        expect(rowEmail.trim()).toBe(email.trim());
-        await this.teacherRow.click();
+        const emailCol = this.teacherRow.locator(`td:has-text('${email}')`);
+        await expect(emailCol).toBeVisible();
+        await emailCol.click();
         await this.page.waitForLoadState("networkidle");
-
     }
 }

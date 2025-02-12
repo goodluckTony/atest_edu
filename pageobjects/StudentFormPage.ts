@@ -12,6 +12,8 @@ export class StudentFormPage {
     private studentTelegram: Locator;
     private submitBtn: Locator;
 
+    public studentId: number;
+
     constructor(page: Page) {
         this.page = page;
         this.studentLastName = page.locator("input[name='user.lastName']");
@@ -22,6 +24,7 @@ export class StudentFormPage {
         this.studentPhone = page.locator("input[name='user.phone']");
         this.studentTelegram = page.locator("input[name='user.telegram']");
         this.submitBtn = page.locator("button[type='submit']");
+        this.listenForCreateStudentResponse();
     }
 
     async fillStudentForm(student: CreateStudentData): Promise<void> {
@@ -39,6 +42,31 @@ export class StudentFormPage {
         await this.page.waitForLoadState("networkidle");
         await this.submitBtn.click();
         await this.page.waitForLoadState("networkidle");
+
+        await this.page.pause();
+    }
+
+    listenForCreateStudentResponse(): void {
+        this.page.on('response', async (response) => {
+            if (response.url().includes('/graphql') && response.status() === 200) {
+                const request = response.request(); 
+                const postData = request.postData();
+
+                if (!postData) return;
+
+                const requestBody = JSON.parse(postData);
+
+                if (requestBody.query.includes('mutation createStudent')) {
+                    const resJson = await response.json();
+                    
+                    // Extract userId if present
+                    if (resJson.data?.createStudent) {
+                        console.log('Captured User ID:', resJson.data.createStudent.id);
+                        this.studentId = +resJson.data.createStudent.id
+                    }
+                }
+            }
+        });
     }
 }
 

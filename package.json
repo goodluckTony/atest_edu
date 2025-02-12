@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test --headed tests/EditTeacher",
+    "teacher": "npx playwright test --headed tests/EditTeacher",
+    "student": "npx playwright test --headed tests/CreateStudent",
     "test-debug": "npx playwright test --debug"
   },
   "keywords": [],

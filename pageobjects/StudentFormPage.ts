@@ -3,6 +3,7 @@ import path from "path";
 
 export class StudentFormPage {
     private page: Page;
+    private fileUploadInput: Locator;
     private studentLastName: Locator;
     private studentFirstName: Locator;
     private studentSurname: Locator;
@@ -16,6 +17,7 @@ export class StudentFormPage {
 
     constructor(page: Page) {
         this.page = page;
+        this.fileUploadInput = page.locator("input[type='file']");
         this.studentLastName = page.locator("input[name='user.lastName']");
         this.studentFirstName = page.locator("input[name='user.firstName']");
         this.studentSurname = page.locator("input[name='user.surname']");
@@ -28,6 +30,7 @@ export class StudentFormPage {
     }
 
     async fillStudentForm(student: CreateStudentData): Promise<void> {
+        await this.fileUploadInput.setInputFiles(path.resolve("assets/stud-img.png"));
         await this.studentLastName.fill(student.lastName);
         await this.studentFirstName.fill(student.firstName);
         await this.studentSurname.fill(student.surname);

@@ -33,7 +33,7 @@ test.describe('User creation', () => {
     apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
   });
 
-  test('Should create test teacher', async ({ page, request }) => {
+  test('Should create test teacher', async ({ page }) => {
     
     const mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher();

@@ -43,5 +43,23 @@
     "email": "Mustafa.Effertz34@example.com",
     "phone": "+380634568191",
     "telegram": "@Eino"
+  },
+  {
+    "lastName": "Kuvalis",
+    "firstName": "Urban",
+    "surname": "Parker",
+    "date": "11.12.2016",
+    "email": "Linda64@example.com",
+    "phone": "+380936786126",
+    "telegram": "@Lauretta"
+  },
+  {
+    "lastName": "Feest",
+    "firstName": "Keara",
+    "surname": "Hayden",
+    "date": "20.02.1964",
+    "email": "Karl.Herzog70@example.com",
+    "phone": "+380984004493",
+    "telegram": "@Tressie"
   }
 ]

@@ -1,8 +1,10 @@
 import { Locator, Page } from "@playwright/test";
 import path from "path";
+import { ApiHelper } from "./utils/ApiHelper";
 
 export class TeacherFormPage {
     private page: Page;
+    private apiHelper: ApiHelper;
     private fileUploadInput: Locator;
     private lastNameInput: Locator;
     private firstNameInput: Locator;
@@ -18,8 +20,9 @@ export class TeacherFormPage {
     
     public teacherId: number;
 
-    constructor (page: Page) {
+    constructor (page: Page, apiHelper: ApiHelper) {
         this.page = page;
+        this.apiHelper = apiHelper;
         this.fileUploadInput = page.locator("input[type='file']");
         this.lastNameInput = page.locator("[name='lastName']");
         this.firstNameInput = page.locator("[name='firstName']");
@@ -32,7 +35,6 @@ export class TeacherFormPage {
         this.telegramInput = page.locator("[name='telegram']");
         this.linkInput = page.locator("[name='link']");
         this.submitButton = page.locator("button[type='submit']");
-        this.listenForCreateTeacherResponse();
     }
 
     async fillTeacherForm(teacher: CreateTeacherData): Promise<void> {
@@ -49,6 +51,7 @@ export class TeacherFormPage {
         await this.linkInput.fill(teacher.link);
         await this.uploadTeacherImage(teacher.gender);
         await this.page.waitForLoadState("networkidle");
+        // await this.page.pause();
     }
 
     async uploadTeacherImage(gender: Gender): Promise<void> {
@@ -59,35 +62,15 @@ export class TeacherFormPage {
         await this.fileUploadInput.setInputFiles(imagePath);
     }
 
-    async submitForm(): Promise<void> {
+    async submitForm(): Promise<number> {
         await this.page.waitForLoadState("networkidle");
         await this.submitButton.click();
         await this.page.waitForLoadState("networkidle");
 
-        await this.page.pause();
-    }
-
-    listenForCreateTeacherResponse(): void {
-        this.page.on('response', async (response) => {
-            if (response.url().includes('/graphql') && response.status() === 200) {
-                const request = response.request(); 
-                const postData = request.postData(); // Get request body
-
-                if (!postData) return;
-
-                const requestBody = JSON.parse(postData); // Parse GraphQL request body
-
-                if (requestBody.query.includes('mutation createTeacher')) {
-                    const resJson = await response.json();
-                    
-                    // Extract userId if present
-                    if (resJson.data?.createTeacher) {
-                        console.log('Captured User ID:', resJson.data.createTeacher.id);
-                        this.teacherId = +resJson.data.createTeacher.id
-                    }
-                }
-            }
-        });
+        // Wait for api response and turn the captured teacherId
+        this.teacherId = await this.apiHelper.getCreatedTeacherId(this.page) ?? 0;
+        console.log(`Teacher created wtih ID: ${this.teacherId}`);
+        return this.teacherId;
     }
 }
 

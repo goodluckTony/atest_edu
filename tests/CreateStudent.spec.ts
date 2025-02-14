@@ -70,7 +70,7 @@ test.describe("Student creation", () => {
         token = loginPage.accessToken;
         userId = studentFormPage.studentId;
     
-        // DELETE created teacher via API
+        // DELETE created user via API
         console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
         if(userId && token) {
           const isDeleted = await apiHelper.deleteUser(userId, token);

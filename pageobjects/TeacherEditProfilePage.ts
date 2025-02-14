@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-export class EditTeacherProfile {
+export class TeacherEditProfilePage {
   private page: Page;
   private teacherEditBtn: Locator;
   private lastNameInput: Locator;
@@ -33,30 +33,41 @@ export class EditTeacherProfile {
 
   }
   
-  async editTeacherProfileButton(): Promise<void> {
+  async editTeacherProfile(newTeacher: EditTeacherData): Promise<void> {
     await this.teacherEditBtn.click();
     await this.page.waitForLoadState("networkidle");
+
+    await this.lastNameInput.fill(newTeacher.lastName);
+    await this.firstNameInput.fill(newTeacher.firstName);
+    await this.surnameInput.fill(newTeacher.surname);
+    await this.birthdayInput.fill(newTeacher.date);
+    await this.editTeacherGender();
+    await this.editTeacherEmail(newTeacher);
+    await this.phoneInput.fill(newTeacher.phone);
+    await this.telegramInput.fill(newTeacher.telegram);
+    await this.linkInput.fill(newTeacher.link);
+    await this.saveChangesButton.click();
   }
 
-  async editTeacherLastname(): Promise<void> {
-    await this.firstNameInput.fill("LN");
-  }
+  // async editTeacherLastname(): Promise<void> {
+  //   await this.firstNameInput.fill("LN");
+  // }
 
-  async editTeacherFirstname(): Promise<void> {
-    await this.firstNameInput.fill("FN");
-  }
+  // async editTeacherFirstname(): Promise<void> {
+  //   await this.firstNameInput.fill("FN");
+  // }
 
-  async editTeacherSurname(): Promise<void> {
-    await this.surnameInput.fill("SN");
-  }
+  // async editTeacherSurname(): Promise<void> {
+  //   await this.surnameInput.fill("SN");
+  // }
 
-  async editTeacherBirthday(): Promise<void> {
-    await this.birthdayInput.fill("01.02.2003");
-  }
+  // async editTeacherBirthday(): Promise<void> {
+  //   await this.birthdayInput.fill("01.02.2003");
+  // }
 
-  async editTeacherSubject(user: EditTeacherData): Promise<void> {
-    await this.subjectDropdown.click();
-  }
+  // async editTeacherSubject(user: EditTeacherData): Promise<void> {
+  //   await this.subjectDropdown.click();
+  // }
   
   async editTeacherGender(): Promise<void> {
     const femaleLabel = this.page.locator("label:has-text('Жіноча')");
@@ -67,25 +78,25 @@ export class EditTeacherProfile {
       : await femaleLabel.click();
   }
 
-  async editTeacherEmail(user: EditTeacherData): Promise<void> {
+  async editTeacherEmail(newTeacher: EditTeacherData): Promise<void> {
     const currentEmail = await this.emailInput.inputValue();
     const domain = currentEmail.substring(currentEmail.indexOf("@"));
-    const newEmail = `${user.firstName}${user.lastName}${domain}`;
+    const newEmail = `${newTeacher.firstName}${newTeacher.lastName}${domain}`;
     await this.emailInput.fill(newEmail);
     await this.page.pause();
   }
 
-  async editTeacherPhone(): Promise<void> {
-    await this.phoneInput.fill("Abdul");
-  }
+  // async editTeacherPhone(): Promise<void> {
+  //   await this.phoneInput.fill("Abdul");
+  // }
 
-  async editTeacherTelegram(): Promise<void> {
-    await this.telegramInput.fill("Abdul");
-  }
+  // async editTeacherTelegram(): Promise<void> {
+  //   await this.telegramInput.fill("Abdul");
+  // }
 
-  async editTeacherLink(): Promise<void> {
-    await this.linkInput.fill("Abdul");
-  }
+  // async editTeacherLink(): Promise<void> {
+  //   await this.linkInput.fill("Abdul");
+  // }
 
   getSaveChangesButton(): Locator {
     return this.saveChangesButton;

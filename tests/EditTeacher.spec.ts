@@ -5,32 +5,32 @@ import { AdminPanelUsersPage } from '../pageobjects/AdminPanelUsersPage';
 import { TeacherListPage } from '../pageobjects/TeacherListPage';
 import { Gender, TeacherFormPage, CreateTeacherData } from '../pageobjects/TeacherFormPage';
 import { TeacherProfilePage } from '../pageobjects/TeacherProfilePage';
-import { EditTeacherProfile } from '../pageobjects/TeacherEditProfile';
+import { TeacherEditProfilePage } from '../pageobjects/TeacherEditProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 
 test.describe('User creation', () => {
+  let apiHelper: ApiHelper;
   let loginPage: LoginPage;
   let adminPanelUsersPage: AdminPanelUsersPage;
   let teacherListPage: TeacherListPage;
   let teacherFormPage: TeacherFormPage;
   let teacherProfilePage: TeacherProfilePage;
-  let editTeacherProfile: EditTeacherProfile;
+  let teacherEditProfilePage: TeacherEditProfilePage;
   let teacher;
   let newTeacher;
-  let apiHelper: ApiHelper;
   let token: string;
   let userId: number;
 
   test.beforeEach(async ({ page, request }) => {
-    loginPage = new LoginPage(page);
+    apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
+    loginPage = new LoginPage(page, apiHelper);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
-    teacherFormPage = new TeacherFormPage(page);
+    teacherFormPage = new TeacherFormPage(page, apiHelper);
     teacherProfilePage = new TeacherProfilePage(page);
-    editTeacherProfile = new EditTeacherProfile(page);
-    apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
+    teacherEditProfilePage = new TeacherEditProfilePage(page);
   });
 
   test('Should create test teacher', async ({ page }) => {
@@ -42,6 +42,10 @@ test.describe('User creation', () => {
     // Login as admin
     await loginPage.open()
     await loginPage.login(mainCred.email, mainCred.pass);
+    token = loginPage.accessToken;
+    if (!token) {
+      throw new Error("Access token not received after login.");
+    }
   
     // Navigate to teacher form
     await adminPanelUsersPage.navigateToTeachersList();
@@ -49,7 +53,11 @@ test.describe('User creation', () => {
   
     // Fill teacher form
     await teacherFormPage.fillTeacherForm(teacher);
-    await teacherFormPage.submitForm();
+    // await teacherFormPage.submitForm();
+
+    // Submit and capture teacher ID
+    userId = await teacherFormPage.submitForm();
+    console.log(`Captured Teacher ID: ${userId}`);
   
     // Search teacher and verify details
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
@@ -70,31 +78,33 @@ test.describe('User creation', () => {
 
 
     // Add teacher into test-teachers.json 
-    const teachersFilePath = 'test-teachers.json';
-    const existingTeachers = await fs.readFile(teachersFilePath, 'utf-8').catch(() => '[]');
-    const teachers = JSON.parse(existingTeachers);
-    teachers.push(teacher);
-    await fs.writeFile(teachersFilePath, JSON.stringify(teachers, null, 2));
-    console.log(`User data saved to ${teachersFilePath}`);
+    // const teachersFilePath = 'test-teachers.json';
+    // const existingTeachers = await fs.readFile(teachersFilePath, 'utf-8').catch(() => '[]');
+    // const teachers = JSON.parse(existingTeachers);
+    // teachers.push(teacher);
+    // await fs.writeFile(teachersFilePath, JSON.stringify(teachers, null, 2));
+    // console.log(`User data saved to ${teachersFilePath}`);
 
     // Edit teacher profile
-    // await editTeacherProfile.editTeacherProfileButton();
-    // await editTeacherProfile.editTeacherLastname(newTeacher.lastName);
-    // await editTeacherProfile.editTeacherFirstname(newTeacher.firstName);
-    // await editTeacherProfile.editTeacherSurname(newTeacher.surname);
-    // await editTeacherProfile.editTeacherBirthday(newTeacher.date);
-    // await editTeacherProfile.editTeacherGender(newTeacher.gender);
-    // await editTeacherProfile.editTeacherEmail(newTeacher.email);
-    // await editTeacherProfile.editTeacherPhone(newTeacher.phone);
-    // await editTeacherProfile.editTeacherTelegram(newTeacher.telegram);
-    // await editTeacherProfile.editTeacherLink(newTeacher.link);
-    // await expect(editTeacherProfile.getSaveChangesButton()).toBeEnabled();
+    await teacherEditProfilePage.editTeacherProfile(newTeacher);
+
+    // await teacherEditProfilePage.editTeacherProfileButton();
+    // await teacherEditProfilePage.editTeacherLastname(newTeacher.lastName);
+    // await teacherEditProfilePage.editTeacherFirstname(newTeacher.firstName);
+    // await teacherEditProfilePage.editTeacherSurname(newTeacher.surname);
+    // await teacherEditProfilePage.editTeacherBirthday(newTeacher.date);
+    // await teacherEditProfilePage.editTeacherGender(newTeacher.gender);
+    // await teacherEditProfilePage.editTeacherEmail(newTeacher.email);
+    // await teacherEditProfilePage.editTeacherPhone(newTeacher.phone);
+    // await teacherEditProfilePage.editTeacherTelegram(newTeacher.telegram);
+    // await teacherEditProfilePage.editTeacherLink(newTeacher.link);
+    // await expect(teacherEditProfilePage.getSaveChangesButton()).toBeEnabled();
 
   });
   
   test.afterEach(async () => {
-    token = loginPage.accessToken;
-    userId = teacherFormPage.teacherId;
+    // token = loginPage.accessToken;
+    // userId = teacherFormPage.teacherId;
 
     // DELETE created teacher via API
     console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);

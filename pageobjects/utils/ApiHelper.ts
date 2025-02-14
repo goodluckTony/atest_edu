@@ -1,5 +1,5 @@
 import { base } from "@faker-js/faker";
-import { APIRequestContext } from "@playwright/test";
+import { APIRequestContext, Page } from "@playwright/test";
 
 export class ApiHelper {
     private request: APIRequestContext;
@@ -41,4 +41,49 @@ export class ApiHelper {
         }
 
     }
+
+    async getLoginAccessToken(page: Page): Promise<string> {
+        return new Promise((resolve) => {
+            page.on('response', async (response) => {
+                if (response.url().includes('/graphql') && response.status() === 200) {
+                    const request = response.request();
+                    const postData = request.postData();
+
+                    if (!postData) return;
+
+                    const requestBody = JSON.parse(postData);
+                    if (requestBody.query.includes('mutation SignIn')) {
+                        const resJson = await response.json();
+                        if (resJson.data?.signIn?.accessToken) {
+                            console.log('Access token:', resJson.data.signIn.accessToken);
+                            resolve(resJson.data.signIn.accessToken);
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    async getCreatedTeacherId(page: Page): Promise<number | null> {
+        return new Promise((resolve) => {
+            page.on('response', async (response) => {
+                if (response.url().includes('/graphql') && response.status() === 200) {
+                    const request = response.request();
+                    const postData = request.postData();
+
+                    if (!postData) return;
+
+                    const requestBody = JSON.parse(postData);
+                    if (requestBody.query.includes('mutation createTeacher')) {
+                        const resJson = await response.json();
+                        if (resJson.data?.createTeacher) {
+                            console.log('Captured User ID:', resJson.data.createTeacher.id);
+                            resolve(resJson.data.createTeacher.id);
+                        }
+                    }
+                }
+            });
+        });
+    }
+
 }

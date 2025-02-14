@@ -1,19 +1,20 @@
 import { Locator, Page } from '@playwright/test';
+import { ApiHelper } from './utils/ApiHelper';
 
 export class LoginPage {
   private page: Page;
   private emailInput: Locator;
   private passwordInput: Locator;
   private submitButton: Locator;
-  
+  private apiHelper: ApiHelper;
   public accessToken: string;
 
-  constructor(page: Page) {
+  constructor(page: Page, apiHelper: ApiHelper) {
     this.page = page;
     this.emailInput = page.locator("[name='email']");
     this.passwordInput = page.locator("[name='password']");
     this.submitButton = page.locator("[type='submit']");
-    this.listenLoginResponse();
+    this.apiHelper = apiHelper;
   }
 
   async open(): Promise<void> {
@@ -26,27 +27,6 @@ export class LoginPage {
     // await this.page.pause();
     await this.submitButton.click();
     // await this.page.pause();
-  }
-
-  listenLoginResponse(): void {
-    this.page.on('response', async (response) => {
-        if (response.url().includes('/graphql') && response.status() === 200) {
-          const request = response.request(); 
-          const postData = request.postData(); // Get request body
-
-          if (!postData) return;
-
-          const requestBody = JSON.parse(postData); // Parse GraphQL request body
-
-          if (requestBody.query.includes('mutation SignIn')) {
-              const resJson = await response.json();
-              
-              if (resJson.data?.signIn?.accessToken) {
-                console.log('Access token:', resJson.data?.signIn?.accessToken);
-                this.accessToken = resJson.data?.signIn?.accessToken
-              }
-          }
-        }
-    });
+    this.accessToken = await this.apiHelper.getLoginAccessToken(this.page);
   }
 }

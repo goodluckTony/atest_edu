@@ -20,21 +20,26 @@ test.describe('User creation', () => {
   let teacherEditProfilePage: TeacherEditProfilePage;
   let teacher;
   let newTeacher;
+  // let token: string;
+  // let userId: number;
   let token: string;
   let userId: number;
 
   test.beforeEach(async ({ page, request }) => {
     apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
-    loginPage = new LoginPage(page, apiHelper);
+    loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
-    teacherFormPage = new TeacherFormPage(page, apiHelper);
+    teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     teacherEditProfilePage = new TeacherEditProfilePage(page);
+    // token = loginPage.accessToken;
+    // userId = teacherFormPage.teacherId;
   });
 
   test('Should create test teacher', async ({ page }) => {
-    
+    token = loginPage.accessToken;
+    userId = teacherFormPage.teacherId;
     const mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher();
     newTeacher = UserDataGenerator.generateTeacher();
@@ -42,10 +47,6 @@ test.describe('User creation', () => {
     // Login as admin
     await loginPage.open()
     await loginPage.login(mainCred.email, mainCred.pass);
-    token = loginPage.accessToken;
-    if (!token) {
-      throw new Error("Access token not received after login.");
-    }
   
     // Navigate to teacher form
     await adminPanelUsersPage.navigateToTeachersList();
@@ -53,15 +54,11 @@ test.describe('User creation', () => {
   
     // Fill teacher form
     await teacherFormPage.fillTeacherForm(teacher);
-    // await teacherFormPage.submitForm();
+    await teacherFormPage.submitForm();
 
-    // Submit and capture teacher ID
-    userId = await teacherFormPage.submitForm();
-    console.log(`Captured Teacher ID: ${userId}`);
-  
     // Search teacher and verify details
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
-  
+    await page.waitForTimeout(2000);
     await expect(teacherProfilePage.getTeacherLastName()).toHaveText(teacher.lastName);
     await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(teacher.firstName);
     await expect(teacherProfilePage.getTeacherSurname()).toHaveText(teacher.surname);
@@ -78,15 +75,21 @@ test.describe('User creation', () => {
 
 
     // Add teacher into test-teachers.json 
+    await page.pause();
     // const teachersFilePath = 'test-teachers.json';
     // const existingTeachers = await fs.readFile(teachersFilePath, 'utf-8').catch(() => '[]');
     // const teachers = JSON.parse(existingTeachers);
-    // teachers.push(teacher);
+    // // teachers.push(teacher);
+    // teachers.push({
+    //   ...teacher,         // Spread existing teacher properties
+    //   "userId": userId,     // Add user ID
+    //   "accessToken": token  // Add access token
+    // });
     // await fs.writeFile(teachersFilePath, JSON.stringify(teachers, null, 2));
     // console.log(`User data saved to ${teachersFilePath}`);
 
     // Edit teacher profile
-    await teacherEditProfilePage.editTeacherProfile(newTeacher);
+    // await teacherEditProfilePage.editTeacherProfile(newTeacher);
 
     // await teacherEditProfilePage.editTeacherProfileButton();
     // await teacherEditProfilePage.editTeacherLastname(newTeacher.lastName);
@@ -103,8 +106,8 @@ test.describe('User creation', () => {
   });
   
   test.afterEach(async () => {
-    // token = loginPage.accessToken;
-    // userId = teacherFormPage.teacherId;
+    token = loginPage.accessToken;
+    userId = teacherFormPage.teacherId;
 
     // DELETE created teacher via API
     console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
@@ -112,8 +115,8 @@ test.describe('User creation', () => {
       const isDeleted = await apiHelper.deleteUser(userId, token);
       await expect(isDeleted).toBe(true);
       console.log(`Teacher with ID ${userId} deleted successfully.`)
-    } else {
-      console.warn('User ID or Token is missing. Skipping deletion.');
-    }
+    } //else {
+    //   console.warn('User ID or Token is missing. Skipping deletion.');
+    // }
   });
 });

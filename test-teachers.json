@@ -742,5 +742,29 @@
     "phone": "+380973718292",
     "telegram": "@Eldred",
     "link": "https://glittering-heroine.com"
+  },
+  {
+    "lastName": "Swift",
+    "firstName": "Frida",
+    "surname": "Marlowe",
+    "date": "08.10.1998",
+    "subject": "Математика",
+    "gender": 1,
+    "email": "Raoul45@example.com",
+    "phone": "+380682610639",
+    "telegram": "@Emelie",
+    "link": "https://submissive-goat.org"
+  },
+  {
+    "lastName": "Gusikowski",
+    "firstName": "Evangeline",
+    "surname": "Leslie",
+    "date": "23.01.2024",
+    "subject": "Математика",
+    "gender": 2,
+    "email": "Jennyfer94@example.com",
+    "phone": "+380955425753",
+    "telegram": "@Orpha",
+    "link": "https://wretched-catalyst.name"
   }
 ]

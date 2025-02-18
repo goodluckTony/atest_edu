@@ -20,21 +20,17 @@ test.describe('User creation', () => {
   let teacherEditProfilePage: TeacherEditProfilePage;
   let teacher;
   let newTeacher;
-  // let token: string;
-  // let userId: number;
   let token: string;
   let userId: number;
 
   test.beforeEach(async ({ page, request }) => {
-    apiHelper = new ApiHelper(request, "http://dev-api.fasted.space");
+    apiHelper = new ApiHelper(request, "https://dev-api.fasted.space");
     loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     teacherEditProfilePage = new TeacherEditProfilePage(page);
-    // token = loginPage.accessToken;
-    // userId = teacherFormPage.teacherId;
   });
 
   test('Should create test teacher', async ({ page }) => {
@@ -73,20 +69,7 @@ test.describe('User creation', () => {
     const expectedFileName = teacher.gender === Gender.Male ? "male-img.jpg" : "female-img.jpg";
     await expect(imageSrc).toContain(expectedFileName);
 
-
-    // Add teacher into test-teachers.json 
     await page.pause();
-    // const teachersFilePath = 'test-teachers.json';
-    // const existingTeachers = await fs.readFile(teachersFilePath, 'utf-8').catch(() => '[]');
-    // const teachers = JSON.parse(existingTeachers);
-    // // teachers.push(teacher);
-    // teachers.push({
-    //   ...teacher,         // Spread existing teacher properties
-    //   "userId": userId,     // Add user ID
-    //   "accessToken": token  // Add access token
-    // });
-    // await fs.writeFile(teachersFilePath, JSON.stringify(teachers, null, 2));
-    // console.log(`User data saved to ${teachersFilePath}`);
 
     // Edit teacher profile
     // await teacherEditProfilePage.editTeacherProfile(newTeacher);
@@ -105,7 +88,7 @@ test.describe('User creation', () => {
 
   });
   
-  test.afterEach(async () => {
+  test.afterEach(async ({page}) => {
     token = loginPage.accessToken;
     userId = teacherFormPage.teacherId;
 
@@ -113,10 +96,11 @@ test.describe('User creation', () => {
     console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
     if(userId && token) {
       const isDeleted = await apiHelper.deleteUser(userId, token);
+      await page.waitForTimeout(2000);
       await expect(isDeleted).toBe(true);
       console.log(`Teacher with ID ${userId} deleted successfully.`)
-    } //else {
-    //   console.warn('User ID or Token is missing. Skipping deletion.');
-    // }
+    } else {
+      console.warn('User ID or Token is missing. Skipping deletion.');
+    }
   });
 });

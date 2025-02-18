@@ -144,3 +144,12 @@ test('Should create test teacher', async ({ page }) => {
     //         });
     //     });
     // }
+
+    
+    // Add teacher into test-teachers.json
+    // const usersFilePath = 'test-teachers.json';
+    // const existingUsers = await fs.readFile(usersFilePath, 'utf-8').catch(() => '[]');
+    // const users = JSON.parse(existingUsers);
+    // users.push(teacher);
+    // await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
+    // console.log(`User data saved to ${usersFilePath}`);

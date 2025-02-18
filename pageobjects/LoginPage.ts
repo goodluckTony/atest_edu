@@ -24,7 +24,7 @@ export class LoginPage {
     await this.passwordInput.fill(password);
     // await this.page.pause();
     await this.submitButton.click();
-    await this.page.pause();
+    // await this.page.pause();
   }
 
   listenLoginResponse(): void {

@@ -22,7 +22,7 @@ export class TeacherListPage {
         const subjectButton = this.page.locator(`button:has-text('${subject}')`);
         await subjectButton.click();
         await this.searchInput.fill(email);
-        await this.page.waitForLoadState("networkidle");
+        await this.page.waitForTimeout(2000);
         const emailCol = this.teacherRow.locator(`td:has-text('${email}')`);
         await expect(emailCol).toBeVisible();
         await emailCol.click();

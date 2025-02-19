@@ -9,6 +9,7 @@ import { TeacherEditProfilePage } from '../pageobjects/TeacherEditProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
+import { emit } from 'process';
 
 test.describe('User creation', () => {
   let apiHelper: ApiHelper;
@@ -70,7 +71,13 @@ test.describe('User creation', () => {
     await page.pause();
 
     // Edit teacher profile
-    // await teacherEditProfilePage.editTeacherProfile(newTeacher);
+    await teacherEditProfilePage.editTeacherProfile(newTeacher);
+    
+    // Verify edit teacher data
+    await adminPanelUsersPage.navigateToMainPage();
+    await adminPanelUsersPage.navigateToTeachersList();
+    await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
+    await expect(teacherProfilePage.getTeacherLastName()).toHaveText(newTeacher.lastName);
 
     // await teacherEditProfilePage.editTeacherProfileButton();
     // await teacherEditProfilePage.editTeacherLastname(newTeacher.lastName);

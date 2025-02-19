@@ -5,6 +5,7 @@ import { AdminPanelUsersPage } from '../pageobjects/AdminPanelUsersPage';
 import { StudentListPage } from '../pageobjects/StudentListPage';
 import { StudentFormPage } from '../pageobjects/StudentFormPage';
 import { StudentProfilePage } from '../pageobjects/StudentProfilePage';
+import { StudentEditProfilePage } from "../pageobjects/StudentEditProfilePage";
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
@@ -15,6 +16,7 @@ test.describe("Student creation", () => {
     let studentListPage: StudentListPage;
     let studentFormPage: StudentFormPage;
     let studentProfilePage: StudentProfilePage;
+    let studentEditProfilePage: StudentEditProfilePage;
     let student;
     let newStudent;
     let apiHelper: ApiHelper;
@@ -28,6 +30,7 @@ test.describe("Student creation", () => {
       studentListPage = new StudentListPage(page);
       studentFormPage = new StudentFormPage(page);
       studentProfilePage = new StudentProfilePage(page);
+      studentEditProfilePage = new StudentEditProfilePage(page);
       apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
         
       });
@@ -60,8 +63,14 @@ test.describe("Student creation", () => {
         await expect(studentProfilePage.getStudentPhone()).toHaveText(student.phone);
         await expect(studentProfilePage.getStudentTelegram()).toHaveText(student.telegram);
 
-        // Edit student profile
+        // Edit teacher profile
+        await studentEditProfilePage.editTeacherProfile(newStudent);
 
+        // Verify edit teacher data
+        await adminPanelUsersPage.navigateToMainPage();
+        await adminPanelUsersPage.navigateToStudentsList();
+        await studentListPage.searchStudentByEmail(student.email, student.telegram);
+        await expect(studentProfilePage.getStudentLastName()).toHaveText(newStudent.lastName);
     });
 
     test.afterEach(async () => {

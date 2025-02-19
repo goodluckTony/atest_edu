@@ -38,36 +38,16 @@ export class TeacherEditProfilePage {
     await this.page.waitForLoadState("networkidle");
 
     await this.lastNameInput.fill(newTeacher.lastName);
-    await this.firstNameInput.fill(newTeacher.firstName);
-    await this.surnameInput.fill(newTeacher.surname);
-    await this.birthdayInput.fill(newTeacher.date);
-    await this.editTeacherGender();
-    await this.editTeacherEmail(newTeacher);
-    await this.phoneInput.fill(newTeacher.phone);
-    await this.telegramInput.fill(newTeacher.telegram);
-    await this.linkInput.fill(newTeacher.link);
+    // await this.firstNameInput.fill(newTeacher.firstName);
+    // await this.surnameInput.fill(newTeacher.surname);
+    // await this.birthdayInput.fill(newTeacher.date);
+    // await this.editTeacherGender();
+    // await this.editTeacherEmail(newTeacher);
+    // await this.phoneInput.fill(newTeacher.phone);
+    // await this.telegramInput.fill(newTeacher.telegram);
+    // await this.linkInput.fill(newTeacher.link);
     await this.saveChangesButton.click();
   }
-
-  // async editTeacherLastname(): Promise<void> {
-  //   await this.firstNameInput.fill("LN");
-  // }
-
-  // async editTeacherFirstname(): Promise<void> {
-  //   await this.firstNameInput.fill("FN");
-  // }
-
-  // async editTeacherSurname(): Promise<void> {
-  //   await this.surnameInput.fill("SN");
-  // }
-
-  // async editTeacherBirthday(): Promise<void> {
-  //   await this.birthdayInput.fill("01.02.2003");
-  // }
-
-  // async editTeacherSubject(user: EditTeacherData): Promise<void> {
-  //   await this.subjectDropdown.click();
-  // }
   
   async editTeacherGender(): Promise<void> {
     const femaleLabel = this.page.locator("label:has-text('Жіноча')");
@@ -85,18 +65,6 @@ export class TeacherEditProfilePage {
     await this.emailInput.fill(newEmail);
     await this.page.pause();
   }
-
-  // async editTeacherPhone(): Promise<void> {
-  //   await this.phoneInput.fill("Abdul");
-  // }
-
-  // async editTeacherTelegram(): Promise<void> {
-  //   await this.telegramInput.fill("Abdul");
-  // }
-
-  // async editTeacherLink(): Promise<void> {
-  //   await this.linkInput.fill("Abdul");
-  // }
 
   getSaveChangesButton(): Locator {
     return this.saveChangesButton;

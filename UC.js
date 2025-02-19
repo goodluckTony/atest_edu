@@ -153,3 +153,11 @@ test('Should create test teacher', async ({ page }) => {
     // users.push(teacher);
     // await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
     // console.log(`User data saved to ${usersFilePath}`);
+
+    // // Add teacher into test-teachers.json
+    // const studentsFilePath = 'test-students.json';
+    // const existingStudents = await fs.readFile(studentsFilePath, 'utf-8').catch(() => '[]');
+    // const students = JSON.parse(existingStudents);
+    // students.push(student);
+    // await fs.writeFile(studentsFilePath, JSON.stringify(students, null, 2));
+    // console.log(`User data saved to ${studentsFilePath}`);

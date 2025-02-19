@@ -17,21 +17,21 @@ test.describe('User creation', () => {
   let teacherProfilePage: TeacherProfilePage;
   let teacher;
   let apiHelper: ApiHelper;
-  let token: string;
   let userId: number;
+  let mainCred: {email: string, pass: string}
 
   test.beforeEach(async ({ page, request }) => {
+    mainCred = AdminCredentials.admin
     loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
-    apiHelper = new ApiHelper(request, "https://dev-api.fasted.space");
+    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
   });
 
   test('Should create test teacher', async ({ page }) => {
     // Generate random user data
-    const mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher();
 
     // Login
@@ -45,11 +45,9 @@ test.describe('User creation', () => {
     // Fill teacher form
     await teacherFormPage.fillTeacherForm(teacher);
     await teacherFormPage.submitForm();
-    await page.waitForTimeout(2000);
 
     // Search teacher and verify details
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
-    await page.waitForTimeout(2000);
     await expect(teacherProfilePage.getTeacherLastName()).toHaveText(teacher.lastName);
     await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(teacher.firstName);
     await expect(teacherProfilePage.getTeacherSurname()).toHaveText(teacher.surname);
@@ -60,21 +58,23 @@ test.describe('User creation', () => {
     await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(teacher.telegram);
     await expect(teacherProfilePage.getTeacherLink()).toHaveText(teacher.link);
     // await expect(teacherProfilePage.getTeacherLink()).toHaveText("asd");
+    const teacherImage = await teacherProfilePage.getTeacherImage();
+    const imageSrc = await teacherImage.getAttribute("src");
+    const expectedFileName = teacher.gender === Gender.Male ? "male-img.jpg" : "female-img.jpg";
+    await expect(imageSrc).toContain(expectedFileName);
   });
 
   test.afterEach(async ({page}) => {
-    token = loginPage.accessToken;
     userId = teacherFormPage.teacherId;
 
     // DELETE created teacher via API
-    console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
-    if(userId && token) {
-      const isDeleted = await apiHelper.deleteUser(userId, token);
-      await page.waitForTimeout(2000);
-      await expect(isDeleted).toBe(true);
+    console.log(`Attempting to delete user. ID: ${userId}`);
+    if(userId) {
+      const isDeleted = await apiHelper.deleteUser(userId);
+      expect(isDeleted).toBe(true);
       console.log(`Teacher with ID ${userId} deleted successfully.`)
     } else {
-      console.warn('User ID or Token is missing. Skipping deletion.');
+      console.warn('User ID is missing. Skipping deletion.');
     }
   });
 });

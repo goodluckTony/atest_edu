@@ -20,23 +20,22 @@ test.describe('User creation', () => {
   let teacherEditProfilePage: TeacherEditProfilePage;
   let teacher;
   let newTeacher;
-  let token: string;
   let userId: number;
+  let mainCred: {email: string, pass: string}
 
   test.beforeEach(async ({ page, request }) => {
-    apiHelper = new ApiHelper(request, "https://dev-api.fasted.space");
     loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     teacherEditProfilePage = new TeacherEditProfilePage(page);
+    mainCred = AdminCredentials.admin;
+    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
   });
 
   test('Should create test teacher', async ({ page }) => {
-    token = loginPage.accessToken;
-    userId = teacherFormPage.teacherId;
-    const mainCred = AdminCredentials.admin;
+    // Generate random user data
     teacher = UserDataGenerator.generateTeacher();
     newTeacher = UserDataGenerator.generateTeacher();
 
@@ -54,7 +53,6 @@ test.describe('User creation', () => {
 
     // Search teacher and verify details
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
-    await page.waitForTimeout(2000);
     await expect(teacherProfilePage.getTeacherLastName()).toHaveText(teacher.lastName);
     await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(teacher.firstName);
     await expect(teacherProfilePage.getTeacherSurname()).toHaveText(teacher.surname);
@@ -89,15 +87,13 @@ test.describe('User creation', () => {
   });
   
   test.afterEach(async ({page}) => {
-    token = loginPage.accessToken;
     userId = teacherFormPage.teacherId;
 
     // DELETE created teacher via API
-    console.log(`Attempting to delete user. ID: ${userId}, Token: ${token}`);
-    if(userId && token) {
-      const isDeleted = await apiHelper.deleteUser(userId, token);
-      await page.waitForTimeout(2000);
-      await expect(isDeleted).toBe(true);
+    console.log(`Attempting to delete user. ID: ${userId}`);
+    if(userId) {
+      const isDeleted = await apiHelper.deleteUser(userId);
+      expect(isDeleted).toBe(true);
       console.log(`Teacher with ID ${userId} deleted successfully.`)
     } else {
       console.warn('User ID or Token is missing. Skipping deletion.');

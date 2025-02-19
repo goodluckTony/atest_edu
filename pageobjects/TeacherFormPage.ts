@@ -40,6 +40,7 @@ export class TeacherFormPage {
         await this.surnameInput.fill(teacher.surname);
         await this.birthdayInput.fill(teacher.date);
         await this.subjectDropdown.click();
+        
         await this.page.locator(`li:has-text('${teacher.subject}')`).click();
         await this.page.locator(`span input[value='${teacher.gender}']`).click();
         await this.emailInput.fill(teacher.email);
@@ -47,8 +48,7 @@ export class TeacherFormPage {
         await this.telegramInput.fill(teacher.telegram);
         await this.linkInput.fill(teacher.link);
         await this.uploadTeacherImage(teacher.gender);
-        // await this.page.waitForLoadState("networkidle");
-        // await this.page.pause();
+        await this.page.waitForLoadState("networkidle");
     }
 
     async uploadTeacherImage(gender: Gender): Promise<void> {
@@ -60,10 +60,7 @@ export class TeacherFormPage {
     }
 
     async submitForm(): Promise<void> {
-        await this.page.waitForTimeout(2000)
-        // await this.page.pause();
         await this.submitButton.click();
-        // await this.page.pause();
         await this.page.waitForLoadState("networkidle");
     }
 

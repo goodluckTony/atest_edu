@@ -2,6 +2,7 @@ import { APIRequestContext, expect, Page } from "@playwright/test";
 import { assert } from "console";
 import { AdminCredentials } from "./AdminCredentials";
 import { UserDataGenerator } from "../utils/UserDataGenerator";
+import { link } from "fs";
 
 export class ApiHelper {
     private request: APIRequestContext;
@@ -41,11 +42,10 @@ export class ApiHelper {
         this.accessToken = responseJson.data?.signIn?.accessToken;
     }
 
-    async createTeacher(token: string): Promise<number | null> {
-        const teacher = UserDataGenerator.generateTeacher();
+    async createTeacher(teacher): Promise<number | null> {
         const createTeacherRequest = await this.request.post(`${this.baseUrl}/graphql`, {
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${this.accessToken}`,
                 'Content-Type': 'application/json',
             },
             data: {
@@ -57,13 +57,14 @@ export class ApiHelper {
                             birthday: teacher.date,
                             email: teacher.email,
                             firstName: teacher.firstName,
-                            lastName: teacher.lastName,
                             gender: teacher.gender,
+                            lastName: teacher.lastName,
                             phone: teacher.phone,
+                            surname: teacher.surname,
                             telegram: teacher.telegram,
-                            link: teacher.link
                         },
-                        subject: teacher.subject
+                        subjectID: teacher.subject === 'Математика' ? 2 : 1,
+                        link: teacher.link
                     }
                 }
             }
@@ -86,6 +87,51 @@ export class ApiHelper {
         }
     
         console.error('Request failed with status:', createTeacherRequest.status());
+        return null;
+    }
+
+    async createStudent(student): Promise<number | null> {
+        const createStudentRequest = await this.request.post(`${this.baseUrl}/graphql`, {
+            headers: {
+                'Authorization': `Bearer ${this.accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            data: {
+                operationName: "createStudent",
+                query: "mutation createStudent($input: StudentCreateInput!) {\n  createStudent(input: $input) {\n    id\n    profile {\n      ... on StudentProfile {\n        id\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}",
+                variables: {
+                    input: {
+                        user: {
+                            birthday: student.date,
+                            email: student.email,
+                            firstName: student.firstName,
+                            lastName: student.lastName,
+                            phone: student.phone,
+                            surname: student.surname,
+                            telegram: student.telegram,
+                        }
+                    }
+                }
+            }
+        });
+
+        const responseBody = await createStudentRequest.text();
+        console.log('API Response Status:', createStudentRequest.status());
+        console.log('API Response Body:', responseBody);
+    
+        if (createStudentRequest.status() === 200) {
+            try {
+                const responseJson = JSON.parse(responseBody);
+                const studentId = responseJson.data?.createStudent?.id || null;
+                console.log('Created student ID:', studentId);
+                return studentId;
+            } catch (error) {
+                console.error('Error parsing response:', error);
+                return null;
+            }
+        }
+    
+        console.error('Request failed with status:', createStudentRequest.status());
         return null;
     }
 

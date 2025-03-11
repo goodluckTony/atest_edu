@@ -22,7 +22,7 @@ export class TeacherEditProfilePage {
     this.lastNameInput = page.locator("[name='lastName']");
     this.firstNameInput = page.locator("[name='firstName']");
     this.surnameInput = page.locator("[name='surname']");
-    this.birthdayInput = page.locator("[name='birthday']");
+    this.birthdayInput = page.locator("[placeholder='DD.MM.YYYY']");
     this.subjectDropdown = page.locator("[role='combobox']");
     this.genderButton = page.locator("span input[value]");
     this.emailInput = page.locator("[name='email']");
@@ -38,14 +38,14 @@ export class TeacherEditProfilePage {
     await this.page.waitForLoadState("networkidle");
 
     await this.lastNameInput.fill(newTeacher.lastName);
-    // await this.firstNameInput.fill(newTeacher.firstName);
-    // await this.surnameInput.fill(newTeacher.surname);
-    // await this.birthdayInput.fill(newTeacher.date);
-    // await this.editTeacherGender();
-    // await this.editTeacherEmail(newTeacher);
-    // await this.phoneInput.fill(newTeacher.phone);
-    // await this.telegramInput.fill(newTeacher.telegram);
-    // await this.linkInput.fill(newTeacher.link);
+    await this.firstNameInput.fill(newTeacher.firstName);
+    await this.surnameInput.fill(newTeacher.surname);
+    await this.birthdayInput.fill(newTeacher.date);
+    await this.editTeacherGender();
+    await this.emailInput.fill(newTeacher.email);
+    await this.phoneInput.fill(newTeacher.phone);
+    await this.telegramInput.fill(newTeacher.telegram);
+    await this.linkInput.fill(newTeacher.link);
     await this.saveChangesButton.click();
   }
   
@@ -56,14 +56,6 @@ export class TeacherEditProfilePage {
     (await femaleLabel.locator("span.Mui-checked").count() > 0) 
       ? await maleLabel.click() 
       : await femaleLabel.click();
-  }
-
-  async editTeacherEmail(newTeacher: EditTeacherData): Promise<void> {
-    const currentEmail = await this.emailInput.inputValue();
-    const domain = currentEmail.substring(currentEmail.indexOf("@"));
-    const newEmail = `${newTeacher.firstName}${newTeacher.lastName}${domain}`;
-    await this.emailInput.fill(newEmail);
-    await this.page.pause();
   }
 
   getSaveChangesButton(): Locator {

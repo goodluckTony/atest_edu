@@ -10,7 +10,6 @@ export class TeacherListPage {
         this.page = page;
         this.addNewTeacherBtn = page.locator("[href*='teachers/add-new']");
         this.searchInput = page.locator("[placeholder*='Пошук']");
-        // this.teacherRow = page.locator("td:nth-child(3)");
         this.teacherRow = page.locator("tbody a");
     }
 

@@ -68,9 +68,11 @@ export class TeacherFormPage {
         this.page.on('response', async (response) => {
             if (response.url().includes('/graphql') && response.status() === 200) {
                 const request = response.request(); 
-                const postData = request.postData(); // Get request body
+                // Get request body
+                const postData = request.postData(); 
                 if (!postData) return;
-                const requestBody = JSON.parse(postData); // Parse GraphQL request body
+                // Parse GraphQL request body
+                const requestBody = JSON.parse(postData); 
                 if (requestBody.query.includes('mutation createTeacher')) {
                     const resJson = await response.json();
                     
@@ -85,6 +87,11 @@ export class TeacherFormPage {
     }
 }
 
+export enum Gender {
+    Male = 1,
+    Female = 2
+}
+
 export interface CreateTeacherData {
     lastName: string;
     firstName: string;
@@ -96,9 +103,4 @@ export interface CreateTeacherData {
     phone: string;
     telegram: string;
     link: string;
-}
-
-export enum Gender {
-    Male = 1,
-    Female = 2
 }

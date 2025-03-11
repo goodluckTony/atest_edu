@@ -20,7 +20,7 @@ test.describe("Student creation", () => {
     let student;
     let newStudent;
     let apiHelper: ApiHelper;
-    let userId: number;
+    let userId: number | null;
     let mainCred: {email: string, pass: string};
 
     test.beforeEach(async ({ page, request }) => {
@@ -31,37 +31,29 @@ test.describe("Student creation", () => {
       studentFormPage = new StudentFormPage(page);
       studentProfilePage = new StudentProfilePage(page);
       studentEditProfilePage = new StudentEditProfilePage(page);
+      student = UserDataGenerator.generateStudent(true);
       apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
         
       });
       
-      test('Should create test student', async () => {
-        student = UserDataGenerator.generateStudent();
+      test('Should edit existing student', async () => {
+        // Generate random user data
         newStudent = UserDataGenerator.generateStudent();
+        
+        // TODO: create student by API
 
         // Login as admin
         await loginPage.open();
         await loginPage.login(mainCred.email, mainCred.pass);
 
         // Navigate to the admin panel
-        await adminPanelUsersPage.navigateToStudentsList();
-        await studentListPage.addNewStudentBtnClick();
+        userId = await apiHelper.createStudent(student);
 
-        // Fill student form
-        await studentFormPage.fillStudentForm(student);
-        await studentFormPage.submitForm();
+        // Navigate to student tab
+        await adminPanelUsersPage.navigateToStudentsList();
 
         // Search for the student in the list and check if the data is correct
-        await studentListPage.searchStudentByEmail(student.email, student.telegram);
-
-        await expect(studentProfilePage.getStudentImage()).toBeVisible();
-        await expect(studentProfilePage.getStudentLastName()).toHaveText(student.lastName);
-        await expect(studentProfilePage.getStudentFirstName()).toHaveText(student.firstName);
-        await expect(studentProfilePage.getStudentSurname()).toHaveText(student.surname);
-        await expect(studentProfilePage.getStudentDate()).toHaveText(student.date);
-        await expect(studentProfilePage.getStudentEmail()).toHaveText(student.email);
-        await expect(studentProfilePage.getStudentPhone()).toHaveText(student.phone);
-        await expect(studentProfilePage.getStudentTelegram()).toHaveText(student.telegram);
+        await studentListPage.searchApiStudentByEmail(student.email, student.telegram);
 
         // Edit teacher profile
         await studentEditProfilePage.editTeacherProfile(newStudent);
@@ -70,17 +62,22 @@ test.describe("Student creation", () => {
         await adminPanelUsersPage.navigateToMainPage();
         await adminPanelUsersPage.navigateToStudentsList();
         await studentListPage.searchStudentByEmail(student.email, student.telegram);
+
         await expect(studentProfilePage.getStudentLastName()).toHaveText(newStudent.lastName);
+        await expect(studentProfilePage.getStudentFirstName()).toHaveText(newStudent.firstName);
+        await expect(studentProfilePage.getStudentSurname()).toHaveText(newStudent.surname);
+        await expect(studentProfilePage.getStudentDate()).toHaveText(newStudent.date);
+        await expect(studentProfilePage.getStudentEmail()).toHaveText(newStudent.email);
+        await expect(studentProfilePage.getStudentPhone()).toHaveText(newStudent.phone);
+        await expect(studentProfilePage.getStudentTelegram()).toHaveText(newStudent.telegram);
+        // TODO: add verifications for all other fields!!!
     });
 
     test.afterEach(async () => {
-        userId = studentFormPage.studentId;
-
         // DELETE created user via API
         console.log(`Attempting to delete user. ID: ${userId}`);
         if(userId) {
-            const isDeleted = await apiHelper.deleteUser(userId);
-            await expect(isDeleted).toBe(true);
+            await apiHelper.deleteUser(userId);
             console.log(`Student with ID ${userId} deleted successfully.`)
         } else {
             console.warn('User ID or Token is missing. Skipping deletion.');

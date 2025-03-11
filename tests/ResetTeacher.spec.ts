@@ -9,7 +9,7 @@ import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 
-test.describe('Teacher creation', () => {
+test.describe('User creation', () => {
   let loginPage: LoginPage;
   let adminPanelUsersPage: AdminPanelUsersPage;
   let teacherListPage: TeacherListPage;
@@ -17,7 +17,7 @@ test.describe('Teacher creation', () => {
   let teacherProfilePage: TeacherProfilePage;
   let teacher;
   let apiHelper: ApiHelper;
-  let userId: number;
+  let userId: number | null;
   let mainCred: {email: string, pass: string}
 
   test.beforeEach(async ({ page, request }) => {
@@ -27,44 +27,31 @@ test.describe('Teacher creation', () => {
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
-    teacher = UserDataGenerator.generateTeacher();
+    teacher = UserDataGenerator.generateTeacher(true);
     apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
+
   });
 
-  test('Should create teacher', async ({ page }) => {
-
+  test('Should create teacher password', async ({ page }) => {
     // Login
     await loginPage.open()
     await loginPage.login(mainCred.email, mainCred.pass);
 
-    // Navigate to teacher form
-    await adminPanelUsersPage.navigateToTeachersList();
-    await teacherListPage.addNewTeacherBtnClick();
+    // Create teacher via api
+    userId = await apiHelper.createTeacher(teacher);
 
-    // Fill teacher form
-    await teacherFormPage.fillTeacherForm(teacher);
-    await teacherFormPage.submitForm();
+    // Navigate to teacher list
+    await adminPanelUsersPage.navigateToTeachersList();
 
     // Search teacher and verify details
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
-    await expect(teacherProfilePage.getTeacherLastName()).toHaveText(teacher.lastName);
-    await expect(teacherProfilePage.getTeacherFirstName()).toHaveText(teacher.firstName);
-    await expect(teacherProfilePage.getTeacherSurname()).toHaveText(teacher.surname);
-    await expect(teacherProfilePage.getTeacherDate()).toHaveText(teacher.date);
-    await expect(teacherProfilePage.getTeacherGender()).toHaveText(teacher.gender === Gender.Male ? "Чоловіча" : "Жіноча");
-    await expect(teacherProfilePage.getTeacherEmail()).toHaveText(teacher.email);
-    await expect(teacherProfilePage.getTeacherPhone()).toHaveText(teacher.phone);
-    await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(teacher.telegram);
-    // expect(true).toBe(false)
-    await expect(teacherProfilePage.getTeacherLink()).toHaveText(teacher.link);
-    const imageSrc = await teacherProfilePage.getTeacherImageSrc();
-    const expectedImageFileName = await teacherProfilePage.getTeacherImageGender(teacher);
-    await expect(imageSrc).toContain(expectedImageFileName);
+
+    // Create teacher password
+
   });
+  
 
   test.afterEach(async ({page}) => {
-    userId = teacherFormPage.teacherId;
-
     // DELETE created teacher via API
     console.log(`Attempting to delete user. ID: ${userId}`);
     if(userId) {

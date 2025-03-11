@@ -19,7 +19,7 @@ export class StudentEditProfilePage {
     this.lastNameInput = page.locator("[name='lastName']");
     this.firstNameInput = page.locator("[name='firstName']");
     this.surnameInput = page.locator("[name='surname']");
-    this.birthdayInput = page.locator("[name='birthday']");
+    this.birthdayInput = page.locator("[placeholder='DD.MM.YYYY']");
     this.emailInput = page.locator("[name='email']");
     this.phoneInput = page.locator("[name='phone']");
     this.telegramInput = page.locator("[name='telegram']");
@@ -32,14 +32,12 @@ export class StudentEditProfilePage {
     await this.page.waitForLoadState("networkidle");
 
     await this.lastNameInput.fill(newStudent.lastName);
-    // await this.firstNameInput.fill(newTeacher.firstName);
-    // await this.surnameInput.fill(newTeacher.surname);
-    // await this.birthdayInput.fill(newTeacher.date);
-    // await this.editTeacherGender();
-    // await this.editTeacherEmail(newTeacher);
-    // await this.phoneInput.fill(newTeacher.phone);
-    // await this.telegramInput.fill(newTeacher.telegram);
-    // await this.linkInput.fill(newTeacher.link);
+    await this.firstNameInput.fill(newStudent.firstName);
+    await this.surnameInput.fill(newStudent.surname);
+    await this.birthdayInput.fill(newStudent.date);
+    await this.phoneInput.fill(newStudent.phone);
+    await this.telegramInput.fill(newStudent.telegram);
+    await this.emailInput.fill(newStudent.email);
     await this.saveChangesButton.click();
   }
 

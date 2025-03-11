@@ -17,7 +17,7 @@ test.describe("Student creation", () => {
   let studentProfilePage: StudentProfilePage;
   let student;
   let apiHelper: ApiHelper;
-  let userId: number;
+  let userId: number | null;
   let mainCred: {email: string, pass: string};
 
   test.beforeEach(async ({ page, request }) => {
@@ -27,41 +27,31 @@ test.describe("Student creation", () => {
     studentListPage = new StudentListPage(page);
     studentFormPage = new StudentFormPage(page);
     studentProfilePage = new StudentProfilePage(page);
+    student = UserDataGenerator.generateStudent(true);
     apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
       
   });
     
-  test('Should create student', async () => {
-    student = UserDataGenerator.generateStudent();
-
+  test('Should create student password', async () => {
     // Login as admin
     await loginPage.open();
     await loginPage.login(mainCred.email, mainCred.pass);
 
+    // Create student via api
+    userId = await apiHelper.createStudent(student);
+
     // Navigate to the admin panel
     await adminPanelUsersPage.navigateToStudentsList();
-    await studentListPage.addNewStudentBtnClick();
-
-    // Fill student form
-    await studentFormPage.fillStudentForm(student);
-    await studentFormPage.submitForm();
 
     // Search for the student in the list and check if the data is correct
-    await studentListPage.searchStudentByEmail(student.email, student.telegram);
+    await studentListPage.searchApiStudentByEmail(student.email, student.telegram);
 
-    await expect(studentProfilePage.getStudentImage()).toBeVisible();
-    await expect(studentProfilePage.getStudentLastName()).toHaveText(student.lastName);
-    await expect(studentProfilePage.getStudentFirstName()).toHaveText(student.firstName);
-    await expect(studentProfilePage.getStudentSurname()).toHaveText(student.surname);
-    await expect(studentProfilePage.getStudentDate()).toHaveText(student.date);
-    await expect(studentProfilePage.getStudentEmail()).toHaveText(student.email);
-    await expect(studentProfilePage.getStudentPhone()).toHaveText(student.phone);
-    await expect(studentProfilePage.getStudentTelegram()).toHaveText(student.telegram);
+    // Create teacher password
+    expect(true).toBe(false);
+
   });
 
   test.afterEach(async () => {
-    userId = studentFormPage.studentId;
-
     // DELETE created user via API
     console.log(`Attempting to delete user. ID: ${userId}`);
     if(userId) {

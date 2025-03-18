@@ -9,8 +9,10 @@ import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 import { TeacherPanelEngPage } from '../pageobjects/TeacherPanelEngPage';
+import { TeacherPanelMathPage } from '../pageobjects/TeacherPanelMathPage';
+import { TeacherStudyProfilePage } from '../pageobjects/TeacherStudyProfilePage';
 
-test.describe('Teacher setup', () => {
+test.describe('Teacher edu setup', () => {
   let apiHelper: ApiHelper;
   let loginPage: LoginPage;
   let adminPanelUsersPage: AdminPanelUsersPage;
@@ -19,6 +21,8 @@ test.describe('Teacher setup', () => {
   let teacherProfilePage: TeacherProfilePage;
   let teacherEditProfilePage: TeacherEditProfilePage;
   let teacherPanelEngPage: TeacherPanelEngPage;
+  let teacherPanelMathPage: TeacherPanelMathPage;
+  let teacherStudyProfilePage: TeacherStudyProfilePage;
   let teacher;
   let userId: number | null;
   let mainCred: {email: string, pass: string}
@@ -31,6 +35,8 @@ test.describe('Teacher setup', () => {
     teacherProfilePage = new TeacherProfilePage(page);
     teacherEditProfilePage = new TeacherEditProfilePage(page);
     teacherPanelEngPage = new TeacherPanelEngPage(page);
+    teacherPanelMathPage = new TeacherPanelMathPage(page);
+    teacherStudyProfilePage = new TeacherStudyProfilePage(page);
     mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher(true);
     apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
@@ -47,15 +53,23 @@ test.describe('Teacher setup', () => {
     // Navigate to teacher form
     await adminPanelUsersPage.navigateToTeachersList();
 
-    // Search teacher and verify details
+    // Search teacher by email
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
 
     // Nav to teachers study page
     await adminPanelUsersPage.navigateToTeachersStudy();
 
     // Setup teachers study
-    await teacherPanelEngPage.setupTeacherStudy();
+    teacher.subject === "Математика" 
+      ? await teacherPanelMathPage.setupTeacherMathStudy() 
+      : await teacherPanelEngPage.setupTeacherEngStudy();
 
+    // Verify teacher setuped data
+    if(teacher.subject === "Англійська") {
+      await expect(teacherStudyProfilePage.getTeacherLevel()).toContainText("C2");
+    }
+    await expect(teacherStudyProfilePage.getLessonsCount()).toContainText("1");
+    await expect(teacherStudyProfilePage.getIndividualPayment()).toContainText("350");
   });
   
   test.afterEach(async ({page}) => {

@@ -30,7 +30,7 @@ export class TeacherPanelMathPage {
         for (let i = 0; i < count; i++) {
           await this.teacherCheckboxes.nth(i).check();
         }
-        await this.teacherDescription.fill('I am Math teacher');
+        await this.teacherDescription.fill('I am Math teacher!');
         await this.saveButton.click();
     }
 }

@@ -62,6 +62,7 @@ test.describe('Teacher edu setup', () => {
     // Verify teacher setuped data
     await expect(teacherStudyProfilePage.getLessonsCount()).toContainText("1");
     await expect(teacherStudyProfilePage.getIndividualPayment()).toContainText("350");
+    await expect(teacherStudyProfilePage.getTeacherBio()).toContainText("I am Math teacher!");
   });
   
   test.afterEach(async ({page}) => {

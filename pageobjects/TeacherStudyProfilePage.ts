@@ -6,6 +6,7 @@ export class TeacherStudyProfilePage {
     public teacherLevel: Locator;
     private lessonsCount: Locator;
     private individualPayment: Locator;
+    private teacherBio: Locator;
 
 
     constructor(page: Page) {
@@ -13,6 +14,7 @@ export class TeacherStudyProfilePage {
         this.teacherLevel = page.locator("//p[contains(text(), 'Рівень')]/following-sibling::p");
         this.lessonsCount = page.locator("//p[contains(text(), 'Кількість проведених занять')]/following-sibling::p");
         this.individualPayment = page.locator("//p[contains(text(), 'Оплата за індивідуальні')]/following-sibling::p");
+        this.teacherBio = page.locator("//p[contains(text(), 'Bio')]/following::p[2]");
     }
     
     async waitForTeacherProfilePage(): Promise<void> {
@@ -29,5 +31,9 @@ export class TeacherStudyProfilePage {
 
     getIndividualPayment(): Locator {
         return this.individualPayment;
+    }
+
+    getTeacherBio(): Locator {
+        return this.teacherBio;
     }
 }

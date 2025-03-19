@@ -63,6 +63,7 @@ test.describe('Teacher edu setup', () => {
     await expect(teacherStudyProfilePage.getTeacherLevel()).toContainText("C2");
     await expect(teacherStudyProfilePage.getLessonsCount()).toContainText("1");
     await expect(teacherStudyProfilePage.getIndividualPayment()).toContainText("350");
+    await expect(teacherStudyProfilePage.getTeacherBio()).toContainText("I am English teacher!");
   });
   
   test.afterEach(async ({page}) => {

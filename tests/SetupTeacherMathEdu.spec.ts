@@ -8,7 +8,6 @@ import { TeacherEditProfilePage } from '../pageobjects/TeacherEditProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
-import { TeacherPanelEngPage } from '../pageobjects/TeacherPanelEngPage';
 import { TeacherPanelMathPage } from '../pageobjects/TeacherPanelMathPage';
 import { TeacherStudyProfilePage } from '../pageobjects/TeacherStudyProfilePage';
 
@@ -20,7 +19,6 @@ test.describe('Teacher edu setup', () => {
   let teacherFormPage: TeacherFormPage;
   let teacherProfilePage: TeacherProfilePage;
   let teacherEditProfilePage: TeacherEditProfilePage;
-  let teacherPanelEngPage: TeacherPanelEngPage;
   let teacherPanelMathPage: TeacherPanelMathPage;
   let teacherStudyProfilePage: TeacherStudyProfilePage;
   let teacher;
@@ -34,7 +32,6 @@ test.describe('Teacher edu setup', () => {
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     teacherEditProfilePage = new TeacherEditProfilePage(page);
-    teacherPanelEngPage = new TeacherPanelEngPage(page);
     teacherPanelMathPage = new TeacherPanelMathPage(page);
     teacherStudyProfilePage = new TeacherStudyProfilePage(page);
     mainCred = AdminCredentials.admin;
@@ -60,14 +57,9 @@ test.describe('Teacher edu setup', () => {
     await adminPanelUsersPage.navigateToTeachersStudy();
 
     // Setup teachers study
-    teacher.subject === "Математика" 
-      ? await teacherPanelMathPage.setupTeacherMathStudy() 
-      : await teacherPanelEngPage.setupTeacherEngStudy();
+    await teacherPanelMathPage.setupTeacherMathStudy() 
 
     // Verify teacher setuped data
-    if(teacher.subject === "Англійська") {
-      await expect(teacherStudyProfilePage.getTeacherLevel()).toContainText("C2");
-    }
     await expect(teacherStudyProfilePage.getLessonsCount()).toContainText("1");
     await expect(teacherStudyProfilePage.getIndividualPayment()).toContainText("350");
   });

@@ -8,6 +8,7 @@ import { TeacherProfilePage } from '../pageobjects/TeacherProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
+import { config } from '../config';
 
 test.describe('Teacher creation', () => {
   let loginPage: LoginPage;
@@ -21,14 +22,22 @@ test.describe('Teacher creation', () => {
   let mainCred: {email: string, pass: string}
 
   test.beforeEach(async ({ page, request }) => {
-    mainCred = AdminCredentials.admin
+    console.log('BASE_URL:', process.env.BASE_URL);
+    console.log('API_URL:', process.env.API_URL);
+    console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL);
+    console.log('ADMIN_PASS:', process.env.ADMIN_PASS);
+
+    mainCred = AdminCredentials.admin;
+
+    console.log('Preparing Admin Credentials:', mainCred);
+
     loginPage = new LoginPage(page);
     adminPanelUsersPage = new AdminPanelUsersPage(page);
     teacherListPage = new TeacherListPage(page);
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     teacher = UserDataGenerator.generateTeacher();
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
   });
 
   test('Should create teacher', async ({ page }) => {

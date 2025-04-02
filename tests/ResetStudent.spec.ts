@@ -8,6 +8,7 @@ import { StudentProfilePage } from '../pageobjects/StudentProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
+import { config } from '../config';
 
 test.describe("Student creation", () => {
   let loginPage: LoginPage;
@@ -27,9 +28,8 @@ test.describe("Student creation", () => {
     studentListPage = new StudentListPage(page);
     studentFormPage = new StudentFormPage(page);
     studentProfilePage = new StudentProfilePage(page);
-    student = UserDataGenerator.generateStudent(true);
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
-      
+    student = UserDataGenerator.generateStudent(true); 
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
   });
     
   test('Should create student password', async () => {
@@ -44,7 +44,7 @@ test.describe("Student creation", () => {
     await adminPanelUsersPage.navigateToStudentsList();
 
     // Search for the student in the list and check if the data is correct
-    await studentListPage.searchApiStudentByEmail(student.email, student.telegram);
+    await studentListPage.searchStudentByEmail(student.email, student.telegram);
 
     // Create teacher password
     expect(true).toBe(false);

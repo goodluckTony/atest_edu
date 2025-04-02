@@ -8,6 +8,7 @@ import { TeacherProfilePage } from '../pageobjects/TeacherProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
+import { config } from '../config';
 
 test.describe('User creation', () => {
   let loginPage: LoginPage;
@@ -28,8 +29,7 @@ test.describe('User creation', () => {
     teacherFormPage = new TeacherFormPage(page);
     teacherProfilePage = new TeacherProfilePage(page);
     teacher = UserDataGenerator.generateTeacher(true);
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
-
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
   });
 
   test('Should create teacher password', async ({ page }) => {

@@ -10,8 +10,9 @@ import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 import { TeacherPanelEngPage } from '../pageobjects/TeacherPanelEngPage';
 import { TeacherStudyProfilePage } from '../pageobjects/TeacherStudyProfilePage';
+import { config } from '../config';
 
-test.describe('Teacher edu setup', () => {
+test.describe('Teacher edu setup of eng', () => {
   let apiHelper: ApiHelper;
   let loginPage: LoginPage;
   let adminPanelUsersPage: AdminPanelUsersPage;
@@ -36,7 +37,7 @@ test.describe('Teacher edu setup', () => {
     teacherStudyProfilePage = new TeacherStudyProfilePage(page);
     mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher(true);
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
   });
 
   test('Should setup existing teacher', async ({ page }) => {
@@ -54,12 +55,18 @@ test.describe('Teacher edu setup', () => {
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
 
     // Nav to teachers study page
-    await adminPanelUsersPage.navigateToTeachersStudy();
+    await teacherProfilePage.navigateToTeachersStudy();
 
     // Setup teachers study
+    // TODO:
+    // Rename page object -> teacherStudyEngPage
+    // Rename method -> setupTeacherStudy
+    // Pass study data as parameter
     await teacherPanelEngPage.setupTeacherEngStudy();
 
     // Verify teacher setuped data
+    // TODO: verify data against object
+    // TODO: add video examples
     await expect(teacherStudyProfilePage.getTeacherLevel()).toContainText("C2");
     await expect(teacherStudyProfilePage.getLessonsCount()).toContainText("1");
     await expect(teacherStudyProfilePage.getIndividualPayment()).toContainText("350");

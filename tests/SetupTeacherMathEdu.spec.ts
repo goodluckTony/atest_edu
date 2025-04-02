@@ -10,8 +10,9 @@ import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 import { TeacherPanelMathPage } from '../pageobjects/TeacherPanelMathPage';
 import { TeacherStudyProfilePage } from '../pageobjects/TeacherStudyProfilePage';
+import { config } from '../config';
 
-test.describe('Teacher edu setup', () => {
+test.describe('Teacher edu setup of math', () => {
   let apiHelper: ApiHelper;
   let loginPage: LoginPage;
   let adminPanelUsersPage: AdminPanelUsersPage;
@@ -36,7 +37,7 @@ test.describe('Teacher edu setup', () => {
     teacherStudyProfilePage = new TeacherStudyProfilePage(page);
     mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher(true);
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
   });
 
   test('Should setup existing teacher', async ({ page }) => {
@@ -54,9 +55,10 @@ test.describe('Teacher edu setup', () => {
     await teacherListPage.searchTeacherByEmail(teacher.email, teacher.subject);
 
     // Nav to teachers study page
-    await adminPanelUsersPage.navigateToTeachersStudy();
+    await teacherProfilePage.navigateToTeachersStudy();
 
     // Setup teachers study
+    // TODO: same shit as for eng page
     await teacherPanelMathPage.setupTeacherMathStudy() 
 
     // Verify teacher setuped data

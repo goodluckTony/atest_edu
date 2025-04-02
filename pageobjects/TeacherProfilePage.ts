@@ -15,6 +15,7 @@ export class TeacherProfilePage {
     private teacherProfileImage: Locator;
     private inviteTeacherBtn: Locator;
     private resetPasswordLink: Locator;
+    private teachersStudy: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -30,6 +31,7 @@ export class TeacherProfilePage {
         this.teacherProfileImage = page.locator("img.MuiAvatar-img");
         this.inviteTeacherBtn = page.locator("button:has-text('Відправити інвайт')");
         this.resetPasswordLink = page.locator("[href*='password-reset']");
+        this.teachersStudy = page.locator("[href*='teachers/study']");
     }
     
     async waitForTeacherProfilePage(): Promise<void> {
@@ -103,5 +105,9 @@ export class TeacherProfilePage {
         ]);
         await newPage.waitForLoadState("domcontentloaded");
         return newPage;
+    }
+
+    async navigateToTeachersStudy(): Promise<void> {
+        await this.teachersStudy.click();
     }
 }

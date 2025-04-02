@@ -10,6 +10,7 @@ import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
 import { emit } from 'process';
+import { config } from '../config';
 
 test.describe('Teacher edit', () => {
   let apiHelper: ApiHelper;
@@ -33,7 +34,7 @@ test.describe('Teacher edit', () => {
     teacherEditProfilePage = new TeacherEditProfilePage(page);
     mainCred = AdminCredentials.admin;
     teacher = UserDataGenerator.generateTeacher(true);
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
   });
 
   test('Should edit existing teacher', async ({ page }) => {
@@ -68,6 +69,7 @@ test.describe('Teacher edit', () => {
     await expect(teacherProfilePage.getTeacherEmail()).toHaveText(newTeacher.email);
     await expect(teacherProfilePage.getTeacherPhone()).toHaveText(newTeacher.phone);
     await expect(teacherProfilePage.getTeacherTelegram()).toHaveText(newTeacher.telegram);
+    // TODO: add avatar verification (similar to student)
   });
   
   test.afterEach(async ({page}) => {

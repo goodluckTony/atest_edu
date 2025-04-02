@@ -24,18 +24,18 @@ export class StudentListPage {
         const rowTelegram = this.page.locator(`td:has-text('${telegram}')`);
         await expect(rowTelegram).toBeVisible();
         await rowTelegram.click();
-        await this.page.waitForSelector("img.MuiAvatar-img");
+        // await this.page.waitForSelector("img.MuiAvatar-img"); Check
         await this.page.waitForLoadState("networkidle");
     }
 
-    async searchApiStudentByEmail(email: string, telegram: string): Promise<void> {
-        const filterBtn = this.page.locator("button:has-text('Всі учні')");
-        await filterBtn.click();
-        await this.searchInput.fill(email);
-        await this.page.waitForLoadState("networkidle");
-        const rowTelegram = this.page.locator(`td:has-text('${telegram}')`);
-        await expect(rowTelegram).toBeVisible();
-        await rowTelegram.click();
-        await this.page.waitForLoadState("networkidle");
-    }
+    // async searchApiStudentByEmail(email: string, telegram: string): Promise<void> {
+    //     const filterBtn = this.page.locator("button:has-text('Всі учні')");
+    //     await filterBtn.click();
+    //     await this.searchInput.fill(email);
+    //     await this.page.waitForLoadState("networkidle");
+    //     const rowTelegram = this.page.locator(`td:has-text('${telegram}')`);
+    //     await expect(rowTelegram).toBeVisible();
+    //     await rowTelegram.click();
+    //     await this.page.waitForLoadState("networkidle");
+    // }
 }

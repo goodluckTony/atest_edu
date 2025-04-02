@@ -8,6 +8,7 @@ import { StudentProfilePage } from '../pageobjects/StudentProfilePage';
 import { AdminCredentials } from '../pageobjects/utils/AdminCredentials';
 import { UserDataGenerator } from '../pageobjects/utils/UserDataGenerator';
 import { ApiHelper } from "../pageobjects/utils/ApiHelper";
+import { config } from '../config';
 
 test.describe("Student creation", () => {
   let loginPage: LoginPage;
@@ -27,7 +28,8 @@ test.describe("Student creation", () => {
     studentListPage = new StudentListPage(page);
     studentFormPage = new StudentFormPage(page);
     studentProfilePage = new StudentProfilePage(page);
-    apiHelper = await ApiHelper.create(request, "https://dev-api.fasted.space", mainCred.email, mainCred.pass);
+    
+    apiHelper = await ApiHelper.create(request, config.apiUrl!, mainCred.email, mainCred.pass);
       
   });
     
@@ -35,6 +37,7 @@ test.describe("Student creation", () => {
     student = UserDataGenerator.generateStudent();
 
     // Login as admin
+    console.log(mainCred.email, mainCred.pass);
     await loginPage.open();
     await loginPage.login(mainCred.email, mainCred.pass);
 
@@ -57,6 +60,8 @@ test.describe("Student creation", () => {
     await expect(studentProfilePage.getStudentEmail()).toHaveText(student.email);
     await expect(studentProfilePage.getStudentPhone()).toHaveText(student.phone);
     await expect(studentProfilePage.getStudentTelegram()).toHaveText(student.telegram);
+
+    // TODO: add avatar
   });
 
   test.afterEach(async () => {
